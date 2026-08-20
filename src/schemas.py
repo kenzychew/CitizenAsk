@@ -52,13 +52,6 @@ class DiscoveryMatch:
 
 
 @dataclass
-class DatastoreRecord:
-    """A single row returned from a data.gov.sg datastore_search call."""
-
-    fields: dict[str, str]
-
-
-@dataclass
 class DatastoreQueryResult:
     """Result of a structured query against a data.gov.sg dataset.
 

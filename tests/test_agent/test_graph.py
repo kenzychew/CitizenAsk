@@ -9,6 +9,7 @@ import pytest
 
 from src.agent.graph import (
     NO_RAG_CONTEXT_MESSAGE,
+    RAG_UNAVAILABLE_MESSAGE,
     AgentDependencies,
     AgentState,
     route_after_discover,
@@ -242,3 +243,21 @@ class TestRagPath:
         assert answer.abstained is True
         assert answer.route == "rag"
         assert answer.answer == NO_RAG_CONTEXT_MESSAGE
+
+    @pytest.mark.asyncio
+    async def test_no_retriever_degrades_gracefully_without_calling_llm(self) -> None:
+        """A document match with no retriever configured degrades rather than crashing."""
+        deps = AgentDependencies(
+            discovery=StubDiscovery([DiscoveryMatch(dataset=DOCUMENT_DATASET, score=5.0)]),
+            datagovsg_client=StubDataGovSgClient(),
+            retriever=None,
+            plan_query=_never_called_plan_query(),
+            generate_answer=_never_called_generate_answer(),
+            config=AppConfig(),
+        )
+
+        answer = await run_agent(deps, "Tell me about CPF LIFE.")
+
+        assert answer.abstained is True
+        assert answer.route == "rag"
+        assert answer.answer == RAG_UNAVAILABLE_MESSAGE

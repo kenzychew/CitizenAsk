@@ -88,7 +88,7 @@ async def init_dependencies(config: AppConfig) -> None:
     _container.agent_deps = AgentDependencies(
         discovery=discovery,
         datagovsg_client=datagovsg_client,
-        retriever=retriever,  # type: ignore[arg-type]
+        retriever=retriever,
         plan_query=make_plan_query(llm),
         generate_answer=make_generate_answer(llm),
         config=config,

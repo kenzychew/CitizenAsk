@@ -36,6 +36,11 @@ NO_RAG_CONTEXT_MESSAGE = (
     "content to answer this specific question."
 )
 
+RAG_UNAVAILABLE_MESSAGE = (
+    "I found a related topic in my registry, but document search is temporarily "
+    "unavailable, so I can't answer this specific question right now."
+)
+
 PlanFn = Callable[[str, DatasetEntry], Awaitable[QueryPlan]]
 AnswerFn = Callable[[list[BaseMessage]], Awaitable[str]]
 
@@ -47,7 +52,9 @@ class AgentDependencies:
     Attributes:
         discovery: Catalog discovery over the curated registry.
         datagovsg_client: Client for the real data.gov.sg datastore_search API.
-        retriever: pgvector document retriever for the RAG fallback.
+        retriever: pgvector document retriever for the RAG fallback, or None
+            if Postgres was unreachable at startup, in which case the rag
+            node degrades gracefully instead of crashing.
         plan_query: Async callable turning (question, dataset) into a QueryPlan,
             wrapping an LLM structured-output call in production.
         generate_answer: Async callable turning a message list into answer text,
@@ -57,7 +64,7 @@ class AgentDependencies:
 
     discovery: CatalogDiscovery
     datagovsg_client: DataGovSgClient
-    retriever: DocRetriever
+    retriever: DocRetriever | None
     plan_query: PlanFn
     generate_answer: AnswerFn
     config: AppConfig
@@ -161,6 +168,13 @@ def build_graph(
 
     async def rag_node(state: AgentState) -> dict[str, object]:
         """Retrieve document chunks and synthesize a cited answer."""
+        if deps.retriever is None:
+            return {
+                "answer": AgentAnswer(
+                    answer=RAG_UNAVAILABLE_MESSAGE, abstained=True, route="rag", citations=[]
+                )
+            }
+
         chunks = await deps.retriever.retrieve(state.question, top_k=deps.config.rag.top_k)
 
         if not chunks:
