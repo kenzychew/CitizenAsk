@@ -38,7 +38,7 @@ Once discovery finds a `STRUCTURED` dataset, an LLM call turns the question into
 
 ### RAG fallback for document-shaped agencies
 
-Some registry entries are guide-shaped rather than table-shaped (CPF LIFE payouts, HDB's BTO process, NEA's dengue programme, LTA's COE system, PUB's NEWater, MOH's MediSave). Their content lives as plain text under `data/` and is chunked, embedded locally with `sentence-transformers` (`all-MiniLM-L6-v2`, no API key), and stored in Postgres via `pgvector` (`src/rag/ingest.py`, `src/rag/retriever.py`). If retrieval turns up nothing relevant, the RAG node abstains rather than answering from thin air.
+Some registry entries are guide-shaped rather than table-shaped (CPF LIFE payouts, HDB's BTO process, NEA's dengue programme, LTA's COE system, PUB's NEWater, MOH's MediSave). Their content lives as plain text under `data/` and is chunked, embedded locally with `sentence-transformers` (`all-MiniLM-L6-v2`, no API key), and stored in Postgres via `pgvector` (`src/rag/ingest.py`, `src/rag/retriever.py`). If retrieval turns up nothing relevant, the RAG node abstains rather than answering from thin air; if Postgres was unreachable at startup (no retriever configured), it abstains with a distinct "document search is temporarily unavailable" message instead of crashing.
 
 ### Abstention
 
@@ -123,6 +123,7 @@ from src.config import load_config
 from src.rag.ingest import Embedder, VectorIndexer, chunk_text, load_documents
 import asyncpg
 
+
 async def main():
     config = load_config()
     pool = await asyncpg.create_pool(config.database_url)
@@ -135,6 +136,7 @@ async def main():
         chunks.extend(chunk_text(text, source, config.rag.chunk_size, config.rag.chunk_overlap))
     embedder.embed_chunks(chunks)
     await indexer.upsert_chunks(chunks)
+
 
 asyncio.run(main())
 ```
