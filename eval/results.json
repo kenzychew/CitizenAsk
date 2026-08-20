@@ -1,0 +1,671 @@
+{
+  "summary": {
+    "dataset_selection": {
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "n": 20
+    },
+    "structured_answers": {
+      "accuracy": 1.0,
+      "n": 8
+    },
+    "rag_retrieval": {
+      "hit_at_3": 1.0,
+      "mrr": 1.0,
+      "n": 6
+    },
+    "abstention": {
+      "accuracy": 1.0,
+      "n": 30
+    }
+  },
+  "dataset_selection_details": [
+    {
+      "id": "ds01",
+      "question": "What is the average HDB resale price in Bishan?",
+      "expected_title": "HDB Resale Flat Prices",
+      "top_matches": [
+        "HDB Resale Flat Prices",
+        "Consumer Price Index (CPI), 2024 Base Year, Monthly",
+        "Private Residential Property Price Index, Quarterly"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds02",
+      "question": "What's the monthly rent for subletting HDB flats in Toa Payoh?",
+      "expected_title": "Renting Out of Flats from Jan 2021",
+      "top_matches": [
+        "Renting Out of Flats from Jan 2021",
+        "HDB Resale Flat Prices",
+        "Total Output in Manufacturing, Annual"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds03",
+      "question": "How many resident households live in condos versus HDB flats?",
+      "expected_title": "Resident Households by Income and Type of Dwelling (Census 2020)",
+      "top_matches": [
+        "Resident Households by Income and Type of Dwelling (Census 2020)",
+        "Resident Households by Income and Household Structure (Census 2010)",
+        "Renting Out of Flats from Jan 2021"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds04",
+      "question": "What is the private residential rental index this quarter?",
+      "expected_title": "Private Residential Property Rental Index, Quarterly",
+      "top_matches": [
+        "Private Residential Property Rental Index, Quarterly",
+        "Private Residential Property Price Index, Quarterly",
+        "Residential Wired Broadband Subscriptions, Monthly"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds05",
+      "question": "How many bus stops and taxi stands does LTA maintain?",
+      "expected_title": "Commuter Facilities",
+      "top_matches": [
+        "Commuter Facilities",
+        "Premium Bus Services",
+        "LTA Certificate of Entitlement (COE) System Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds06",
+      "question": "What are the operating hours for Premium Bus Service routes?",
+      "expected_title": "Premium Bus Services",
+      "top_matches": [
+        "Premium Bus Services",
+        "Commuter Facilities",
+        "CPF LIFE Payout Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds07",
+      "question": "What is the average daily passenger ridership on public transport?",
+      "expected_title": "Public Transport Journeys",
+      "top_matches": [
+        "Public Transport Journeys",
+        "LTA Certificate of Entitlement (COE) System Guide",
+        "Exchange Rates, SGD per USD, Daily"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds08",
+      "question": "What was the PM2.5 sub-index reading in the West region in 2024?",
+      "expected_title": "Historical Pollutant Standards Index (PSI) 2024",
+      "top_matches": [
+        "Historical Pollutant Standards Index (PSI) 2024",
+        "Historical 24-hr PSI",
+        "Consumer Price Index (CPI), 2024 Base Year, Monthly"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds09",
+      "question": "How many dengue cases were reported this epidemiological week?",
+      "expected_title": "Weekly Number of Dengue and Dengue Haemorrhagic Fever Cases",
+      "top_matches": [
+        "Weekly Number of Dengue and Dengue Haemorrhagic Fever Cases",
+        "Weekly Infectious Disease Bulletin Cases",
+        "NEA Dengue Prevention Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds10",
+      "question": "How much NEWater was sold in Singapore last year?",
+      "expected_title": "Volume of NEWater Sold, Annual",
+      "top_matches": [
+        "Volume of NEWater Sold, Annual",
+        "PUB NEWater Guide",
+        "NEWater Tariff"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds11",
+      "question": "What is the median gross monthly income of full-time employed residents?",
+      "expected_title": "Median Gross Monthly Income of Full-Time Employed Residents",
+      "top_matches": [
+        "Median Gross Monthly Income of Full-Time Employed Residents",
+        "Residents Aged 15+ by Labour Force Status and Age",
+        "Resident Households by Income and Type of Dwelling (Census 2020)"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds12",
+      "question": "How many people aged 25 to 29 are in the labour force?",
+      "expected_title": "Residents Aged 15+ by Labour Force Status and Age",
+      "top_matches": [
+        "Residents Aged 15+ by Labour Force Status and Age",
+        "CPF LIFE Payout Guide",
+        "HDB Build-To-Order (BTO) Application Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds13",
+      "question": "What percentage of PSLE students scored A* to C in Standard Mathematics?",
+      "expected_title": "Percentage of PSLE Students who Scored A*-C in Standard Mathematics",
+      "top_matches": [
+        "Percentage of PSLE Students who Scored A*-C in Standard Mathematics",
+        "Percentage of PSLE Students who Scored A*-C in Standard Science",
+        "Consumer Price Index (CPI), 2024 Base Year, Monthly"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds14",
+      "question": "What was Singapore's total manufacturing output in 2015?",
+      "expected_title": "Total Output in Manufacturing, Annual",
+      "top_matches": [
+        "Total Output in Manufacturing, Annual",
+        "Volume of NEWater Sold, Annual",
+        "PUB NEWater Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds15",
+      "question": "When does CPF LIFE start paying out and how much do I get monthly?",
+      "expected_title": "CPF LIFE Payout Guide",
+      "top_matches": [
+        "CPF LIFE Payout Guide",
+        "MOH MediSave Guide",
+        "Renting Out of Flats from Jan 2021"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds16",
+      "question": "How do I apply for a BTO flat and how does the balloting work?",
+      "expected_title": "HDB Build-To-Order (BTO) Application Guide",
+      "top_matches": [
+        "HDB Build-To-Order (BTO) Application Guide",
+        "CPF LIFE Payout Guide",
+        "MOH MediSave Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds17",
+      "question": "What can I do at home to prevent dengue and mosquito breeding?",
+      "expected_title": "NEA Dengue Prevention Guide",
+      "top_matches": [
+        "NEA Dengue Prevention Guide",
+        "Weekly Number of Dengue and Dengue Haemorrhagic Fever Cases",
+        "HDB Build-To-Order (BTO) Application Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds18",
+      "question": "How does COE bidding work and how long is a COE valid for?",
+      "expected_title": "LTA Certificate of Entitlement (COE) System Guide",
+      "top_matches": [
+        "LTA Certificate of Entitlement (COE) System Guide",
+        "CPF LIFE Payout Guide",
+        "MOH MediSave Guide"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds19",
+      "question": "What is NEWater and how much of our water demand does it meet?",
+      "expected_title": "PUB NEWater Guide",
+      "top_matches": [
+        "PUB NEWater Guide",
+        "Volume of NEWater Sold, Annual",
+        "NEWater Tariff"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    },
+    {
+      "id": "ds20",
+      "question": "What can I use my MediSave savings for?",
+      "expected_title": "MOH MediSave Guide",
+      "top_matches": [
+        "MOH MediSave Guide",
+        "Total Output in Manufacturing, Annual",
+        "Premium Bus Services"
+      ],
+      "hit_at_1": true,
+      "hit_at_3": true
+    }
+  ],
+  "structured_answers_details": [
+    {
+      "id": "sa01",
+      "question": "How many HDB resale transactions were there in Ang Mo Kio in January 1990?",
+      "expected_answer": 151,
+      "actual": {
+        "count": "151"
+      },
+      "correct": true,
+      "error": null
+    },
+    {
+      "id": "sa02",
+      "question": "What was the median gross monthly income including employer CPF for full-time employed residents in 2023?",
+      "expected_answer": 5197.0,
+      "actual": {
+        "average": "5197.0"
+      },
+      "correct": true,
+      "error": null
+    },
+    {
+      "id": "sa03",
+      "question": "What percentage of Chinese PSLE students scored A* to C in Standard Mathematics in 2020?",
+      "expected_answer": 89.2,
+      "actual": {
+        "average": "89.2"
+      },
+      "correct": true,
+      "error": null
+    },
+    {
+      "id": "sa04",
+      "question": "What percentage of all PSLE students scored A* to C in Standard Science in 2020?",
+      "expected_answer": 90.4,
+      "actual": {
+        "average": "90.4"
+      },
+      "correct": true,
+      "error": null
+    },
+    {
+      "id": "sa05",
+      "question": "How much NEWater was sold in Singapore in 2020?",
+      "expected_answer": 141.1,
+      "actual": {
+        "sum": "141.1"
+      },
+      "correct": true,
+      "error": null
+    },
+    {
+      "id": "sa06",
+      "question": "What was Singapore's total manufacturing output value in 2015?",
+      "expected_answer": 284691.2,
+      "actual": {
+        "average": "284691.2"
+      },
+      "correct": true,
+      "error": null
+    },
+    {
+      "id": "sa07",
+      "question": "How many residents aged 25 to 29 were employed in 2015?",
+      "expected_answer": 208000.0,
+      "actual": {
+        "average": "208000.0"
+      },
+      "correct": true,
+      "error": null
+    },
+    {
+      "id": "sa08",
+      "question": "What is the NEWater tariff before GST?",
+      "expected_answer": {
+        "tariff_before_gst": "1.28"
+      },
+      "actual": {
+        "_id": 1,
+        "tariff_category": "NEWater",
+        "consumption_block": "All Units",
+        "tariff_before_gst": "1.28",
+        "tariff_after_gst": "1.369",
+        "wbf_before_gst": "0.92",
+        "wbf_after_gst": "0.984"
+      },
+      "correct": true,
+      "error": null
+    }
+  ],
+  "rag_retrieval_details": [
+    {
+      "id": "r01",
+      "question": "At what age do CPF LIFE payouts typically start?",
+      "expected_source": "cpf-life-payouts.txt",
+      "top_sources": [
+        "cpf-life-payouts.txt",
+        "moh-medisave.txt",
+        "lta-coe-system.txt"
+      ],
+      "hit_at_3": true,
+      "rank": 1
+    },
+    {
+      "id": "r02",
+      "question": "How often does HDB launch new BTO exercises each year?",
+      "expected_source": "hdb-bto-application.txt",
+      "top_sources": [
+        "hdb-bto-application.txt",
+        "lta-coe-system.txt",
+        "cpf-life-payouts.txt"
+      ],
+      "hit_at_3": true,
+      "rank": 1
+    },
+    {
+      "id": "r03",
+      "question": "What are the 5 steps of the Mozzie Wipeout routine?",
+      "expected_source": "nea-dengue-prevention.txt",
+      "top_sources": [
+        "nea-dengue-prevention.txt",
+        "pub-newater.txt",
+        "cpf-life-payouts.txt"
+      ],
+      "hit_at_3": true,
+      "rank": 1
+    },
+    {
+      "id": "r04",
+      "question": "How long is a Certificate of Entitlement valid for?",
+      "expected_source": "lta-coe-system.txt",
+      "top_sources": [
+        "lta-coe-system.txt",
+        "cpf-life-payouts.txt",
+        "hdb-bto-application.txt"
+      ],
+      "hit_at_3": true,
+      "rank": 1
+    },
+    {
+      "id": "r05",
+      "question": "Which NEWater plant is co-located with a desalination plant?",
+      "expected_source": "pub-newater.txt",
+      "top_sources": [
+        "pub-newater.txt",
+        "nea-dengue-prevention.txt",
+        "lta-coe-system.txt"
+      ],
+      "hit_at_3": true,
+      "rank": 1
+    },
+    {
+      "id": "r06",
+      "question": "What is MediShield Life and how does it relate to MediSave?",
+      "expected_source": "moh-medisave.txt",
+      "top_sources": [
+        "moh-medisave.txt",
+        "cpf-life-payouts.txt",
+        "nea-dengue-prevention.txt"
+      ],
+      "hit_at_3": true,
+      "rank": 1
+    }
+  ],
+  "rag_retrieval_note": "Faithfulness (does the generated answer actually reflect the retrieved chunks) is not scored here: it requires a live LLM generation call, which needs OPENAI_API_KEY and is not available in this environment. Retrieval quality above uses the real local sentence-transformers embedder, not a mock.",
+  "abstention_details": [
+    {
+      "question": "What is the capital of France?",
+      "source": "abstention_set",
+      "score": 2.508864246456118,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "Can you write me a poem about the ocean?",
+      "source": "abstention_set",
+      "score": 3.4299628727392304,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "What is 2 plus 2?",
+      "source": "abstention_set",
+      "score": 0.0,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "Tell me a joke.",
+      "source": "abstention_set",
+      "score": 3.4299628727392304,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "How do I bake a chocolate cake?",
+      "source": "abstention_set",
+      "score": 3.4299628727392304,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "Translate hello into French.",
+      "source": "abstention_set",
+      "score": 0.0,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "What year did World War Two end?",
+      "source": "abstention_set",
+      "score": 2.967983568451323,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "How many moons does Jupiter have?",
+      "source": "abstention_set",
+      "score": 2.944639612522453,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "How do I tie a necktie?",
+      "source": "abstention_set",
+      "score": 3.4299628727392304,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "What is the tallest mountain on Earth?",
+      "source": "abstention_set",
+      "score": 2.79047587233708,
+      "expected_abstain": true,
+      "actual_abstain": true,
+      "correct": true
+    },
+    {
+      "question": "What is the average HDB resale price in Bishan?",
+      "source": "dataset_selection_set",
+      "score": 9.200132713937123,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What's the monthly rent for subletting HDB flats in Toa Payoh?",
+      "source": "dataset_selection_set",
+      "score": 15.345027366247855,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "How many resident households live in condos versus HDB flats?",
+      "source": "dataset_selection_set",
+      "score": 8.916216416434327,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What is the private residential rental index this quarter?",
+      "source": "dataset_selection_set",
+      "score": 17.824611129909975,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "How many bus stops and taxi stands does LTA maintain?",
+      "source": "dataset_selection_set",
+      "score": 21.5719835405026,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What are the operating hours for Premium Bus Service routes?",
+      "source": "dataset_selection_set",
+      "score": 18.308562355351235,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What is the average daily passenger ridership on public transport?",
+      "source": "dataset_selection_set",
+      "score": 22.018839028560915,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What was the PM2.5 sub-index reading in the West region in 2024?",
+      "source": "dataset_selection_set",
+      "score": 17.96049395254485,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "How many dengue cases were reported this epidemiological week?",
+      "source": "dataset_selection_set",
+      "score": 14.097985293962715,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "How much NEWater was sold in Singapore last year?",
+      "source": "dataset_selection_set",
+      "score": 11.875990407791134,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What is the median gross monthly income of full-time employed residents?",
+      "source": "dataset_selection_set",
+      "score": 34.806422262138106,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "How many people aged 25 to 29 are in the labour force?",
+      "source": "dataset_selection_set",
+      "score": 14.072799181282246,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What percentage of PSLE students scored A* to C in Standard Mathematics?",
+      "source": "dataset_selection_set",
+      "score": 36.27188678223384,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What was Singapore's total manufacturing output in 2015?",
+      "source": "dataset_selection_set",
+      "score": 21.639886215562267,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "When does CPF LIFE start paying out and how much do I get monthly?",
+      "source": "dataset_selection_set",
+      "score": 12.094514217760995,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "How do I apply for a BTO flat and how does the balloting work?",
+      "source": "dataset_selection_set",
+      "score": 17.349638440875655,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What can I do at home to prevent dengue and mosquito breeding?",
+      "source": "dataset_selection_set",
+      "score": 9.961712554944068,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "How does COE bidding work and how long is a COE valid for?",
+      "source": "dataset_selection_set",
+      "score": 14.727273087499121,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What is NEWater and how much of our water demand does it meet?",
+      "source": "dataset_selection_set",
+      "score": 11.806944540040112,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    },
+    {
+      "question": "What can I use my MediSave savings for?",
+      "source": "dataset_selection_set",
+      "score": 10.113384243748687,
+      "expected_abstain": false,
+      "actual_abstain": false,
+      "correct": true
+    }
+  ]
+}

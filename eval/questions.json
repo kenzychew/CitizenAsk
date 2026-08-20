@@ -1,0 +1,126 @@
+{
+  "dataset_selection": [
+    {"id": "ds01", "question": "What is the average HDB resale price in Bishan?", "expected_title": "HDB Resale Flat Prices"},
+    {"id": "ds02", "question": "What's the monthly rent for subletting HDB flats in Toa Payoh?", "expected_title": "Renting Out of Flats from Jan 2021"},
+    {"id": "ds03", "question": "How many resident households live in condos versus HDB flats?", "expected_title": "Resident Households by Income and Type of Dwelling (Census 2020)"},
+    {"id": "ds04", "question": "What is the private residential rental index this quarter?", "expected_title": "Private Residential Property Rental Index, Quarterly"},
+    {"id": "ds05", "question": "How many bus stops and taxi stands does LTA maintain?", "expected_title": "Commuter Facilities"},
+    {"id": "ds06", "question": "What are the operating hours for Premium Bus Service routes?", "expected_title": "Premium Bus Services"},
+    {"id": "ds07", "question": "What is the average daily passenger ridership on public transport?", "expected_title": "Public Transport Journeys"},
+    {"id": "ds08", "question": "What was the PM2.5 sub-index reading in the West region in 2024?", "expected_title": "Historical Pollutant Standards Index (PSI) 2024"},
+    {"id": "ds09", "question": "How many dengue cases were reported this epidemiological week?", "expected_title": "Weekly Number of Dengue and Dengue Haemorrhagic Fever Cases"},
+    {"id": "ds10", "question": "How much NEWater was sold in Singapore last year?", "expected_title": "Volume of NEWater Sold, Annual"},
+    {"id": "ds11", "question": "What is the median gross monthly income of full-time employed residents?", "expected_title": "Median Gross Monthly Income of Full-Time Employed Residents"},
+    {"id": "ds12", "question": "How many people aged 25 to 29 are in the labour force?", "expected_title": "Residents Aged 15+ by Labour Force Status and Age"},
+    {"id": "ds13", "question": "What percentage of PSLE students scored A* to C in Standard Mathematics?", "expected_title": "Percentage of PSLE Students who Scored A*-C in Standard Mathematics"},
+    {"id": "ds14", "question": "What was Singapore's total manufacturing output in 2015?", "expected_title": "Total Output in Manufacturing, Annual"},
+    {"id": "ds15", "question": "When does CPF LIFE start paying out and how much do I get monthly?", "expected_title": "CPF LIFE Payout Guide"},
+    {"id": "ds16", "question": "How do I apply for a BTO flat and how does the balloting work?", "expected_title": "HDB Build-To-Order (BTO) Application Guide"},
+    {"id": "ds17", "question": "What can I do at home to prevent dengue and mosquito breeding?", "expected_title": "NEA Dengue Prevention Guide"},
+    {"id": "ds18", "question": "How does COE bidding work and how long is a COE valid for?", "expected_title": "LTA Certificate of Entitlement (COE) System Guide"},
+    {"id": "ds19", "question": "What is NEWater and how much of our water demand does it meet?", "expected_title": "PUB NEWater Guide"},
+    {"id": "ds20", "question": "What can I use my MediSave savings for?", "expected_title": "MOH MediSave Guide"}
+  ],
+  "structured_answers": [
+    {
+      "id": "sa01",
+      "question": "How many HDB resale transactions were there in Ang Mo Kio in January 1990?",
+      "dataset_id": "d_ebc5ab87086db484f88045b47411ebc5",
+      "filters": {"month": "1990-01", "town": "ANG MO KIO"},
+      "operation": "count",
+      "numeric_field": null,
+      "expected_answer": 151,
+      "verified_note": "Live datastore_search total, verified 2026-08-21; 1990-01 is a closed historical month and will not change."
+    },
+    {
+      "id": "sa02",
+      "question": "What was the median gross monthly income including employer CPF for full-time employed residents in 2023?",
+      "dataset_id": "d_9cd9c40f22a4e45cac8f8b9d895fd5ce",
+      "filters": {"year": "2023"},
+      "operation": "average",
+      "numeric_field": "median_income_incl_emp_cpf",
+      "expected_answer": 5197.0,
+      "verified_note": "Single-row match for year=2023, verified live 2026-08-21."
+    },
+    {
+      "id": "sa03",
+      "question": "What percentage of Chinese PSLE students scored A* to C in Standard Mathematics in 2020?",
+      "dataset_id": "d_b860a6f506c921b8fd6cb3667f419db2",
+      "filters": {"year": "2020", "race": "Chinese"},
+      "operation": "average",
+      "numeric_field": "percentage_psle_math",
+      "expected_answer": 89.2,
+      "verified_note": "Single-row match, verified live 2026-08-21."
+    },
+    {
+      "id": "sa04",
+      "question": "What percentage of all PSLE students scored A* to C in Standard Science in 2020?",
+      "dataset_id": "d_af6f5cd97fd8f5497258f059cb044185",
+      "filters": {"year": "2020", "race": "Overall"},
+      "operation": "average",
+      "numeric_field": "percentage_psle_science",
+      "expected_answer": 90.4,
+      "verified_note": "Single-row match, verified live 2026-08-21."
+    },
+    {
+      "id": "sa05",
+      "question": "How much NEWater was sold in Singapore in 2020?",
+      "dataset_id": "d_2eceeb792a0fca1caa74304d47b46060",
+      "filters": {"year": "2020"},
+      "operation": "sum",
+      "numeric_field": "sale_of_newater",
+      "expected_answer": 141.1,
+      "verified_note": "Single-row match, verified live 2026-08-21."
+    },
+    {
+      "id": "sa06",
+      "question": "What was Singapore's total manufacturing output value in 2015?",
+      "dataset_id": "d_566e5d5d7c6685e99018d2aaf70cd142",
+      "filters": {"year": "2015", "level_1": "Total Manufacturing"},
+      "operation": "average",
+      "numeric_field": "value",
+      "expected_answer": 284691.2,
+      "verified_note": "Single-row match, verified live 2026-08-21."
+    },
+    {
+      "id": "sa07",
+      "question": "How many residents aged 25 to 29 were employed in 2015?",
+      "dataset_id": "d_12fc09011acb07b04aa484cbd5ea5ceb",
+      "filters": {"year": "2015", "age": "25-29"},
+      "operation": "average",
+      "numeric_field": "employed",
+      "expected_answer": 208000.0,
+      "verified_note": "Single-row match, verified live 2026-08-21."
+    },
+    {
+      "id": "sa08",
+      "question": "What is the NEWater tariff before GST?",
+      "dataset_id": "d_50830e6a799ccfd00b1ed0a5294920d7",
+      "filters": {},
+      "operation": "list",
+      "numeric_field": null,
+      "expected_answer": {"tariff_before_gst": "1.28"},
+      "verified_note": "Table has exactly one row, verified live 2026-08-21."
+    }
+  ],
+  "rag": [
+    {"id": "r01", "question": "At what age do CPF LIFE payouts typically start?", "expected_source": "cpf-life-payouts.txt"},
+    {"id": "r02", "question": "How often does HDB launch new BTO exercises each year?", "expected_source": "hdb-bto-application.txt"},
+    {"id": "r03", "question": "What are the 5 steps of the Mozzie Wipeout routine?", "expected_source": "nea-dengue-prevention.txt"},
+    {"id": "r04", "question": "How long is a Certificate of Entitlement valid for?", "expected_source": "lta-coe-system.txt"},
+    {"id": "r05", "question": "Which NEWater plant is co-located with a desalination plant?", "expected_source": "pub-newater.txt"},
+    {"id": "r06", "question": "What is MediShield Life and how does it relate to MediSave?", "expected_source": "moh-medisave.txt"}
+  ],
+  "abstention": [
+    {"id": "ab01", "question": "What is the capital of France?", "expected_abstain": true},
+    {"id": "ab02", "question": "Can you write me a poem about the ocean?", "expected_abstain": true},
+    {"id": "ab03", "question": "What is 2 plus 2?", "expected_abstain": true},
+    {"id": "ab04", "question": "Tell me a joke.", "expected_abstain": true},
+    {"id": "ab05", "question": "How do I bake a chocolate cake?", "expected_abstain": true},
+    {"id": "ab06", "question": "Translate hello into French.", "expected_abstain": true},
+    {"id": "ab07", "question": "What year did World War Two end?", "expected_abstain": true},
+    {"id": "ab08", "question": "How many moons does Jupiter have?", "expected_abstain": true},
+    {"id": "ab09", "question": "How do I tie a necktie?", "expected_abstain": true},
+    {"id": "ab10", "question": "What is the tallest mountain on Earth?", "expected_abstain": true}
+  ]
+}

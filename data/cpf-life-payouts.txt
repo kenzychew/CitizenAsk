@@ -1,0 +1,33 @@
+CPF LIFE: Lifelong Retirement Payouts
+
+CPF LIFE (Lifelong Income For the Elderly) is a national annuity scheme
+administered by the Central Provident Fund Board that provides Singapore
+Citizens and Permanent Residents with a monthly payout for as long as they
+live, starting from their payout eligibility age. Members join CPF LIFE
+automatically if they have at least S$60,000 in their Retirement Account
+six months before their payout eligibility age.
+
+The default payout eligibility age is 65, though members can choose to
+start payouts as early as age 65 or defer to as late as age 70. Deferring
+the start of payouts increases the monthly payout amount, by roughly 7%
+for each year deferred, because the same retirement savings are spread
+over a shorter expected payout period.
+
+There are three CPF LIFE plans: the Standard Plan, the Basic Plan, and the
+Escalating Plan. The Standard Plan pays a level monthly amount for life and
+leaves a smaller bequest to beneficiaries. The Basic Plan pays a lower
+monthly amount initially but leaves a larger bequest. The Escalating Plan
+starts with a lower payout that increases by 2% each year, helping payouts
+keep pace with inflation over a long retirement.
+
+CPF LIFE payouts are funded from the Retirement Account, which itself is
+formed from savings in the Ordinary Account and Special Account (or
+Retirement Account, post-55) once a member reaches age 55, up to the
+applicable Full Retirement Sum. Members who have less than the Basic
+Retirement Sum can still join CPF LIFE with a lower starting premium, and
+their payouts will be correspondingly smaller.
+
+Because CPF LIFE is a pooled annuity, members who live longer than average
+continue to receive payouts for as long as they live, cross-subsidized by
+members who have a shorter payout period, which is the core insurance
+function of the scheme.

@@ -1,0 +1,32 @@
+LTA Certificate of Entitlement (COE): Singapore's Vehicle Quota System
+
+The Certificate of Entitlement (COE) is the mechanism the Land Transport
+Authority (LTA) uses to control the total number of vehicles on
+Singapore's roads under the Vehicle Quota System. Anyone who wants to
+register a new vehicle in Singapore must first secure a COE for the
+relevant vehicle category, and the vehicle cannot be registered without
+one.
+
+COEs are allocated through an open bidding exercise held twice a month.
+LTA groups vehicles into five categories: Category A covers smaller and
+less powerful cars, Category B covers larger and more powerful cars,
+Category C covers goods vehicles and buses, Category D covers
+motorcycles, and Category E is the open category, which can be used to
+register any vehicle type except motorcycles. Bidders submit the maximum
+price they are willing to pay, and all successful bidders in a category
+pay the same price, known as the Quota Premium, which is set by the
+lowest successful bid.
+
+A COE is valid for 10 years from the date of vehicle registration. When a
+COE expires, the vehicle owner can either deregister the vehicle or
+renew the COE for another 5 or 10 years by paying a Prevailing Quota
+Premium, which is based on the moving average of recent COE prices in the
+same category.
+
+The total COE quota available each period is derived from the number of
+vehicles being deregistered, adjusted for the government's vehicle growth
+rate targets, which have been set at or near zero for most categories in
+recent years to manage road congestion and land use. Because the quota is
+tight relative to demand, COE premiums have historically been a
+significant part of the total cost of owning a car in Singapore, on top
+of the vehicle's open market value, taxes, and registration fees.
