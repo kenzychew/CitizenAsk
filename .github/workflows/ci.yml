@@ -1,0 +1,30 @@
+# CI: lint, typecheck, and test on every push to main and every pull request.
+# Live data.gov.sg integration tests (tests/**/test_client.py::*Live, marked
+# `integration`) are excluded here to keep CI independent of an external
+# public API's rate limits; they run locally with plain `uv run pytest`.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Sync dependencies
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format check
+        run: uv run ruff format --check .
+      - name: Typecheck
+        run: uv run mypy --strict src
+      - name: Test
+        run: uv run pytest -m "not integration" -q
