@@ -9,7 +9,7 @@ import json
 import logging
 
 import httpx
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from src.config import DataGovSgConfig
 from src.exceptions import DataGovSgError, DatasetNotFoundError, RateLimitError
@@ -29,14 +29,11 @@ class DataGovSgClient:
         """
         self._config = config
 
-    @retry(
-        retry=retry_if_exception_type((httpx.TransportError, RateLimitError)),
-        stop=stop_after_attempt(4),
-        wait=wait_exponential(multiplier=2, min=2, max=15),
-        reraise=True,
-    )
     async def _get(self, params: dict[str, str]) -> dict[str, object]:
         """Issue one GET request against the datastore_search action.
+
+        Retried internally with backoff, up to the configured max_retries,
+        on transport errors and HTTP 429 responses.
 
         Args:
             params: Query parameters to send.
@@ -47,8 +44,32 @@ class DataGovSgClient:
         Raises:
             DatasetNotFoundError: If the API returns HTTP 404, which is what
                 an unknown or non-datastore-active resource_id produces.
-            RateLimitError: If the API returns HTTP 429. Retried internally
-                with backoff by the decorator on this method.
+            RateLimitError: If the API returns HTTP 429 on every retried
+                attempt.
+            DataGovSgError: If the request otherwise fails or the response
+                is malformed.
+        """
+        retryer = AsyncRetrying(
+            retry=retry_if_exception_type((httpx.TransportError, RateLimitError)),
+            stop=stop_after_attempt(self._config.max_retries),
+            wait=wait_exponential(multiplier=2, min=2, max=15),
+            reraise=True,
+        )
+        return await retryer(self._get_once, params)
+
+    async def _get_once(self, params: dict[str, str]) -> dict[str, object]:
+        """Issue a single GET attempt against the datastore_search action.
+
+        Args:
+            params: Query parameters to send.
+
+        Returns:
+            The parsed JSON response body.
+
+        Raises:
+            DatasetNotFoundError: If the API returns HTTP 404, which is what
+                an unknown or non-datastore-active resource_id produces.
+            RateLimitError: If the API returns HTTP 429.
             DataGovSgError: If the request otherwise fails or the response
                 is malformed.
         """
