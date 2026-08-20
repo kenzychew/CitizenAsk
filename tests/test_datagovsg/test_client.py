@@ -112,6 +112,24 @@ class TestDatastoreSearchMocked:
 
     @pytest.mark.asyncio
     @respx.mock
+    async def test_max_retries_config_allows_that_many_retries(self) -> None:
+        """max_retries=1 permits one retry, i.e. two total attempts."""
+        client = DataGovSgClient(DataGovSgConfig(max_retries=1))
+        route = respx.get("https://data.gov.sg/api/action/datastore_search")
+        route.side_effect = [
+            httpx.Response(429, json={"errorMsg": "Rate limit exceeded"}),
+            httpx.Response(
+                200, json={"success": True, "result": {"records": [{"town": "BISHAN"}], "total": 1}}
+            ),
+        ]
+
+        result = await client.datastore_search(HDB_RESALE_DATASET_ID)
+
+        assert result.records == [{"town": "BISHAN"}]
+        assert route.call_count == 2
+
+    @pytest.mark.asyncio
+    @respx.mock
     async def test_datastore_search_server_error_raises_datagovsg_error(
         self, client: DataGovSgClient
     ) -> None:

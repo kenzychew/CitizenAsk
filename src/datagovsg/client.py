@@ -51,7 +51,7 @@ class DataGovSgClient:
         """
         retryer = AsyncRetrying(
             retry=retry_if_exception_type((httpx.TransportError, RateLimitError)),
-            stop=stop_after_attempt(self._config.max_retries),
+            stop=stop_after_attempt(self._config.max_retries + 1),
             wait=wait_exponential(multiplier=2, min=2, max=15),
             reraise=True,
         )
