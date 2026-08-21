@@ -1,0 +1,34 @@
+# --- Discovery ---
+discovery:
+  top_k: 3
+  # Below this BM25 lexical match score the agent abstains instead of
+  # guessing a dataset. Calibrated against eval/questions.json: genuinely
+  # out-of-scope questions scored under 3.5, in-scope questions scored
+  # above 5.1, in manual testing against the real curated registry.
+  confidence_threshold: 4.5
+
+# --- data.gov.sg client ---
+datagovsg:
+  base_url: "https://data.gov.sg/api/action"
+  timeout_seconds: 15.0
+  max_retries: 3
+  default_limit: 100
+
+# --- RAG ---
+rag:
+  embedding_model: "all-MiniLM-L6-v2"
+  embedding_dim: 384
+  chunk_size: 800
+  chunk_overlap: 100
+  top_k: 4
+  table_name: "doc_chunks"
+
+# --- Generation ---
+generation:
+  model: "gpt-4o-mini"
+  temperature: 0.0
+  max_tokens: 1024
+
+database_url: "postgresql://supportivebot:changeme@localhost:5432/supportivebot"
+data_dir: "data"
+log_level: "INFO"
