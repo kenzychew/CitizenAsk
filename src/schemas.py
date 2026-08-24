@@ -1,4 +1,4 @@
-"""Shared data models for supportivebot."""
+"""Shared data models for CitizenAsk."""
 
 from dataclasses import dataclass, field
 from enum import StrEnum

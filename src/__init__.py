@@ -1,1 +1,1 @@
-"""supportivebot: agentic assistant over Singapore government open data."""
+"""CitizenAsk: agentic assistant over Singapore government open data."""

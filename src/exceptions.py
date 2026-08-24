@@ -1,19 +1,19 @@
-"""Custom exception hierarchy for supportivebot."""
+"""Custom exception hierarchy for CitizenAsk."""
 
 
-class SupportiveBotError(Exception):
-    """Base exception for all supportivebot errors."""
+class CitizenAskError(Exception):
+    """Base exception for all CitizenAsk errors."""
 
 
-class ConfigError(SupportiveBotError):
+class ConfigError(CitizenAskError):
     """Raised when configuration is invalid."""
 
 
-class DiscoveryError(SupportiveBotError):
+class DiscoveryError(CitizenAskError):
     """Raised when dataset discovery fails."""
 
 
-class DataGovSgError(SupportiveBotError):
+class DataGovSgError(CitizenAskError):
     """Raised when a data.gov.sg API call fails."""
 
 
@@ -25,7 +25,7 @@ class RateLimitError(DataGovSgError):
     """Raised when data.gov.sg returns HTTP 429. Retried internally by the client."""
 
 
-class RagError(SupportiveBotError):
+class RagError(CitizenAskError):
     """Raised when the RAG fallback pipeline fails."""
 
 
@@ -41,9 +41,9 @@ class RetrievalError(RagError):
     """Raised when vector retrieval fails."""
 
 
-class GenerationError(SupportiveBotError):
+class GenerationError(CitizenAskError):
     """Raised when LLM generation fails."""
 
 
-class AbstentionError(SupportiveBotError):
+class AbstentionError(CitizenAskError):
     """Raised when the agent should abstain but the caller ignored it."""

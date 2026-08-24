@@ -1,1 +1,1 @@
-"""Test suite for supportivebot."""
+"""Test suite for CitizenAsk."""

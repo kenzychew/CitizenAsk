@@ -13,7 +13,7 @@ from src.agent.graph import run_agent
 from src.api.dependencies import close_pool, get_agent_deps, init_dependencies, rag_available
 from src.catalog.registry import REGISTRY
 from src.config import load_config
-from src.exceptions import SupportiveBotError
+from src.exceptions import CitizenAskError
 from src.logging import setup_logging
 
 logger = logging.getLogger(__name__)
@@ -24,18 +24,18 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Initialize dependencies at startup and close them at shutdown."""
     config = load_config()
     setup_logging(log_dir=None)
-    logger.info("Starting supportivebot")
+    logger.info("Starting CitizenAsk")
     await init_dependencies(config)
 
     try:
         yield
     finally:
         await close_pool()
-        logger.info("supportivebot shutdown complete")
+        logger.info("CitizenAsk shutdown complete")
 
 
 app = FastAPI(
-    title="supportivebot",
+    title="citizenask",
     description="General-purpose agentic assistant over Singapore government open data",
     version="0.1.0",
     lifespan=lifespan,
@@ -141,7 +141,7 @@ async def query_agent(
                     }
                 ),
             }
-        except SupportiveBotError as exc:
+        except CitizenAskError as exc:
             logger.error("Query failed", exc_info=exc)
             yield {"event": "error", "data": json.dumps({"error": str(exc)})}
 

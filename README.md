@@ -1,4 +1,4 @@
-# supportivebot
+# CitizenAsk
 
 A general-purpose agentic assistant over Singapore government open data (data.gov.sg), built to be excellent at the mechanism rather than one fixed topic: finding the right dataset, querying it correctly, and knowing when it can't answer.
 
