@@ -29,6 +29,6 @@ generation:
   temperature: 0.0
   max_tokens: 1024
 
-database_url: "postgresql://supportivebot:changeme@localhost:5432/supportivebot"
+database_url: "postgresql://citizenask:changeme@localhost:5432/citizenask"
 data_dir: "data"
 log_level: "INFO"

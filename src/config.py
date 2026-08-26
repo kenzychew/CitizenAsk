@@ -94,7 +94,7 @@ class AppConfig:
     datagovsg: DataGovSgConfig = field(default_factory=DataGovSgConfig)
     rag: RagConfig = field(default_factory=RagConfig)
     generation: GenerationConfig = field(default_factory=GenerationConfig)
-    database_url: str = "postgresql://supportivebot:changeme@localhost:5432/supportivebot"
+    database_url: str = "postgresql://citizenask:changeme@localhost:5432/citizenask"
     data_dir: str = "data"
     log_level: str = "INFO"
 

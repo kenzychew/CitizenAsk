@@ -1,4 +1,4 @@
-"""Logging setup for supportivebot: a YAML logging config with a fallback."""
+"""Logging setup for CitizenAsk: a YAML logging config with a fallback."""
 
 import logging
 import logging.config
