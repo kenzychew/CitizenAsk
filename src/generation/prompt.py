@@ -30,20 +30,58 @@ class QueryPlan(BaseModel):
     numeric_field: str | None = None
 
 
+class QueryFilter(BaseModel):
+    """A single exact-match column filter.
+
+    Attributes:
+        column: The dataset column name to filter on.
+        value: The exact value to match.
+    """
+
+    column: str
+    value: str
+
+
+class QueryPlanLLM(BaseModel):
+    """LLM-facing query plan schema.
+
+    OpenAI's strict structured-output mode cannot enforce an open-ended dict
+    field (arbitrary keys with no fixed properties list), so filters are
+    requested as a list of column/value pairs here instead of the dict shape
+    QueryPlan exposes downstream. Callers convert this to a QueryPlan
+    immediately after the structured-output call returns.
+
+    Attributes:
+        operation: The aggregation or lookup to perform over matching rows.
+        filters: Exact-match column filters to send to datastore_search.
+        numeric_field: The column to aggregate over, required for count/sum/
+            average/min/max operations other than plain row counting.
+    """
+
+    operation: Literal["count", "average", "sum", "min", "max", "list"]
+    filters: list[QueryFilter] = Field(default_factory=list)
+    numeric_field: str | None = None
+
+
 _PLAN_SYSTEM_PROMPT = """You turn a user's question into a query plan against a \
 single structured government dataset.
 
 Given the dataset's title, description, and column names, choose:
 - "operation": what to compute over matching rows ("count", "average", "sum", \
 "min", "max", or "list" to return raw matching rows).
-- "filters": a dict of column name to exact value, using only column names \
-that exist in the dataset. Use the exact value casing implied by the question \
-where possible (e.g. Singapore town names are upper case).
+- "filters": a list of {"column": ..., "value": ...} objects, one per \
+exact-match column filter, using only column names that exist in the dataset. \
+datastore_search does exact string matching, so filter values must match the \
+dataset's own casing, not the question's casing. Singapore town names in \
+government datasets are always upper case (e.g. "BISHAN", "ANG MO KIO") \
+regardless of how they appear in the question; other free-text values are \
+usually title case (e.g. "Chinese", "Overall") unless the dataset's columns \
+imply otherwise.
 - "numeric_field": the numeric column to aggregate, required unless operation \
 is "count" or "list".
 
 Only use column names from the dataset's field list. If the question does not \
-need a filter on a given column, omit it."""
+need a filter on a given column, omit it from the filters list."""
 
 
 def build_plan_messages(question: str, dataset: DatasetEntry) -> list[BaseMessage]:

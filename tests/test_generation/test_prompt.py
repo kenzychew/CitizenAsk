@@ -3,7 +3,9 @@
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.generation.prompt import (
+    QueryFilter,
     QueryPlan,
+    QueryPlanLLM,
     build_plan_messages,
     build_rag_answer_messages,
     build_structured_answer_messages,
@@ -50,6 +52,55 @@ class TestQueryPlanSchema:
         plan = QueryPlan(operation="list")
 
         assert plan.filters == {}
+
+
+class TestQueryPlanLLMSchema:
+    """Tests for QueryPlanLLM, the strict-mode-safe schema used for the LLM call."""
+
+    def test_converts_filter_list_to_query_plan_dict(self) -> None:
+        """QueryPlanLLM's column/value pairs convert to QueryPlan's filters dict."""
+        raw_plan = QueryPlanLLM(
+            operation="average",
+            filters=[QueryFilter(column="town", value="BISHAN")],
+            numeric_field="resale_price",
+        )
+
+        plan = QueryPlan(
+            operation=raw_plan.operation,
+            filters={f.column: f.value for f in raw_plan.filters},
+            numeric_field=raw_plan.numeric_field,
+        )
+
+        assert plan.filters == {"town": "BISHAN"}
+        assert plan.operation == "average"
+        assert plan.numeric_field == "resale_price"
+
+    def test_defaults_filters_to_empty_list(self) -> None:
+        """Omitting filters defaults to an empty list rather than None."""
+        raw_plan = QueryPlanLLM(operation="list")
+
+        assert raw_plan.filters == []
+
+    def test_json_schema_has_no_bare_dict_types(self) -> None:
+        """The generated JSON schema never uses an open-ended dict type.
+
+        OpenAI's strict structured-output mode rejects any object schema
+        with no fixed "properties" list (the shape Pydantic emits for a
+        bare `dict[str, str]` field), so the schema must not contain one.
+        """
+        schema = QueryPlanLLM.model_json_schema()
+
+        def assert_no_wildcard_object(node: object) -> None:
+            if isinstance(node, dict):
+                if node.get("type") == "object" and "properties" not in node:
+                    raise AssertionError(f"found wildcard object schema: {node}")
+                for value in node.values():
+                    assert_no_wildcard_object(value)
+            elif isinstance(node, list):
+                for item in node:
+                    assert_no_wildcard_object(item)
+
+        assert_no_wildcard_object(schema)
 
 
 class TestBuildStructuredAnswerMessages:
