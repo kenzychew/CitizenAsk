@@ -36,6 +36,43 @@ class TestBuildPlanMessages:
         assert "town, resale_price, flat_type" in human_text
         assert "average resale price in Bishan" in human_text
 
+    def test_omits_example_rows_when_none_given(self) -> None:
+        """No sample_rows argument means no "Example rows" section in the prompt."""
+        dataset = DatasetEntry(
+            dataset_id="d_ebc5ab87086db484f88045b47411ebc5",
+            title="HDB Resale Flat Prices",
+            agency="HDB",
+            description="Resale transactions.",
+            tags=["housing"],
+            kind=DatasetKind.STRUCTURED,
+            fields=["month", "town"],
+        )
+
+        messages = build_plan_messages("Average price in Bishan?", dataset)
+
+        assert "Example rows" not in str(messages[1].content)
+
+    def test_includes_example_rows_when_given(self) -> None:
+        """Sample rows appear in the human message so the LLM can mirror their format."""
+        dataset = DatasetEntry(
+            dataset_id="d_ebc5ab87086db484f88045b47411ebc5",
+            title="HDB Resale Flat Prices",
+            agency="HDB",
+            description="Resale transactions.",
+            tags=["housing"],
+            kind=DatasetKind.STRUCTURED,
+            fields=["month", "town"],
+        )
+        sample_rows = [{"month": "1990-01", "town": "BISHAN"}]
+
+        messages = build_plan_messages(
+            "Transactions in Bishan in January 1990?", dataset, sample_rows
+        )
+
+        human_text = str(messages[1].content)
+        assert "Example rows" in human_text
+        assert "1990-01" in human_text
+
 
 class TestQueryPlanSchema:
     """Tests for the QueryPlan pydantic model's validation behaviour."""

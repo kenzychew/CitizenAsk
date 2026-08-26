@@ -41,7 +41,7 @@ RAG_UNAVAILABLE_MESSAGE = (
     "unavailable, so I can't answer this specific question right now."
 )
 
-PlanFn = Callable[[str, DatasetEntry], Awaitable[QueryPlan]]
+PlanFn = Callable[[str, DatasetEntry, list[dict[str, str]]], Awaitable[QueryPlan]]
 AnswerFn = Callable[[list[BaseMessage]], Awaitable[str]]
 
 
@@ -55,8 +55,9 @@ class AgentDependencies:
         retriever: pgvector document retriever for the RAG fallback, or None
             if Postgres was unreachable at startup, in which case the rag
             node degrades gracefully instead of crashing.
-        plan_query: Async callable turning (question, dataset) into a QueryPlan,
-            wrapping an LLM structured-output call in production.
+        plan_query: Async callable turning (question, dataset, sample_rows)
+            into a QueryPlan, wrapping an LLM structured-output call in
+            production.
         generate_answer: Async callable turning a message list into answer text,
             wrapping a plain LLM completion call in production.
         config: Application configuration.
@@ -132,7 +133,17 @@ def build_graph(
         assert dataset is not None  # route_after_discover guarantees this
 
         try:
-            plan = await deps.plan_query(state.question, dataset)
+            sample_rows = await deps.datagovsg_client.sample_rows(dataset.dataset_id)
+        except DataGovSgError as exc:
+            logger.warning(
+                "Sample-row fetch failed for %s, planning without example rows: %s",
+                dataset.dataset_id,
+                exc,
+            )
+            sample_rows = []
+
+        try:
+            plan = await deps.plan_query(state.question, dataset, sample_rows)
             fetched = await deps.datagovsg_client.fetch_all_matching(
                 dataset.dataset_id, filters=plan.filters
             )

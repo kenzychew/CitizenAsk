@@ -17,6 +17,19 @@ then convert to the dict shape downstream code expects immediately after the
 call returns. Apply the same pattern to any new structured-output schema
 that would otherwise need an arbitrary-keys dict field.
 
+## Grounding query-planning filter values with real sample rows
+
+`DatasetEntry.fields` (`src/schemas.py`) only carries column *names*, not the
+literal format values take (e.g. a `month` column stored as `"1990-01"`, not
+"January 1990"). The planning LLM (`build_plan_messages`,
+`src/generation/prompt.py`) has no way to guess that format from metadata
+alone, so `structured_node` (`src/agent/graph.py`) fetches a few real rows
+via `DataGovSgClient.sample_rows` (`src/datagovsg/client.py`, cached per
+`dataset_id` on the client instance) and passes them into the prompt as
+"Example rows" before planning. Apply the same pattern — show the LLM real
+data rather than hand-encoding a formatting rule — for any new column whose
+value format isn't self-evident from its name.
+
 ## Maintaining this file
 
 Keep this file for knowledge useful to almost every future agent session in this project.

@@ -24,11 +24,17 @@ class StubDataGovSgClient:
     """Returns a canned result or raises a canned error from fetch_all_matching."""
 
     def __init__(
-        self, result: DatastoreQueryResult | None = None, error: DataGovSgError | None = None
+        self,
+        result: DatastoreQueryResult | None = None,
+        error: DataGovSgError | None = None,
+        sample: list[dict[str, str]] | None = None,
+        sample_error: DataGovSgError | None = None,
     ) -> None:
         """Store the canned result or error."""
         self._result = result
         self._error = error
+        self._sample = sample if sample is not None else []
+        self._sample_error = sample_error
         self.calls: list[tuple[str, dict[str, str] | None]] = []
 
     async def fetch_all_matching(
@@ -40,6 +46,12 @@ class StubDataGovSgClient:
             raise self._error
         assert self._result is not None
         return self._result
+
+    async def sample_rows(self, dataset_id: str, limit: int = 3) -> list[dict[str, str]]:
+        """Return the canned sample rows, or raise the canned sample-fetch error."""
+        if self._sample_error:
+            raise self._sample_error
+        return self._sample
 
 
 class StubRetriever:

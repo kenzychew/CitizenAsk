@@ -46,19 +46,21 @@ def get_chat_model(config: GenerationConfig) -> ChatOpenAI:
 
 def make_plan_query(
     llm: ChatOpenAI,
-) -> Callable[[str, DatasetEntry], Awaitable[QueryPlan]]:
+) -> Callable[[str, DatasetEntry, list[dict[str, str]]], Awaitable[QueryPlan]]:
     """Build the agent graph's plan_query callable from a chat model.
 
     Args:
         llm: The chat model to use for structured-output planning calls.
 
     Returns:
-        An async callable turning (question, dataset) into a QueryPlan.
+        An async callable turning (question, dataset, sample_rows) into a QueryPlan.
     """
     structured_llm = llm.with_structured_output(QueryPlanLLM)
 
-    async def plan_query(question: str, dataset: DatasetEntry) -> QueryPlan:
-        messages = build_plan_messages(question, dataset)
+    async def plan_query(
+        question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]]
+    ) -> QueryPlan:
+        messages = build_plan_messages(question, dataset, sample_rows)
         raw_plan = await structured_llm.ainvoke(messages)
         assert isinstance(raw_plan, QueryPlanLLM)
         return QueryPlan(
