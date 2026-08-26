@@ -14,7 +14,7 @@ from langchain_openai import ChatOpenAI
 
 from src.config import GenerationConfig
 from src.exceptions import GenerationError
-from src.generation.prompt import QueryPlan, build_plan_messages
+from src.generation.prompt import QueryPlan, QueryPlanLLM, build_plan_messages
 from src.schemas import DatasetEntry
 
 
@@ -55,13 +55,17 @@ def make_plan_query(
     Returns:
         An async callable turning (question, dataset) into a QueryPlan.
     """
-    structured_llm = llm.with_structured_output(QueryPlan)
+    structured_llm = llm.with_structured_output(QueryPlanLLM)
 
     async def plan_query(question: str, dataset: DatasetEntry) -> QueryPlan:
         messages = build_plan_messages(question, dataset)
-        plan = await structured_llm.ainvoke(messages)
-        assert isinstance(plan, QueryPlan)
-        return plan
+        raw_plan = await structured_llm.ainvoke(messages)
+        assert isinstance(raw_plan, QueryPlanLLM)
+        return QueryPlan(
+            operation=raw_plan.operation,
+            filters={f.column: f.value for f in raw_plan.filters},
+            numeric_field=raw_plan.numeric_field,
+        )
 
     return plan_query
 
