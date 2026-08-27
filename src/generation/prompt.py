@@ -81,15 +81,26 @@ imply otherwise.
 is "count" or "list".
 
 Only use column names from the dataset's field list. If the question does not \
-need a filter on a given column, omit it from the filters list."""
+need a filter on a given column, omit it from the filters list.
+
+When example rows are provided, they show the exact literal format each \
+column's values actually take in this dataset (e.g. a "month" column stored \
+as "1990-01" rather than "January 1990"). Match that exact format for any \
+filter value on a column an example row covers, in preference to writing \
+the value the way the question phrases it."""
 
 
-def build_plan_messages(question: str, dataset: DatasetEntry) -> list[BaseMessage]:
+def build_plan_messages(
+    question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]] | None = None
+) -> list[BaseMessage]:
     """Build the messages that ask the LLM to produce a QueryPlan.
 
     Args:
         question: The user's natural-language question.
         dataset: The matched structured dataset to plan a query against.
+        sample_rows: A few real rows from the dataset, if fetched, so the
+            LLM can mirror their exact value formats in filters rather than
+            guessing from the question's phrasing.
 
     Returns:
         A system + human message pair for a structured-output LLM call.
@@ -98,9 +109,11 @@ def build_plan_messages(question: str, dataset: DatasetEntry) -> list[BaseMessag
         f"Dataset: {dataset.title}\n"
         f"Agency: {dataset.agency}\n"
         f"Description: {dataset.description}\n"
-        f"Columns: {', '.join(dataset.fields)}\n\n"
-        f"Question: {question}"
+        f"Columns: {', '.join(dataset.fields)}"
     )
+    if sample_rows:
+        context += "\nExample rows: " + str(sample_rows)
+    context += f"\n\nQuestion: {question}"
     return [SystemMessage(content=_PLAN_SYSTEM_PROMPT), HumanMessage(content=context)]
 
 

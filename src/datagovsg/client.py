@@ -28,6 +28,7 @@ class DataGovSgClient:
             config: data.gov.sg client configuration.
         """
         self._config = config
+        self._sample_cache: dict[str, list[dict[str, str]]] = {}
 
     async def _get(self, params: dict[str, str]) -> dict[str, object]:
         """Issue one GET request against the datastore_search action.
@@ -151,6 +152,33 @@ class DataGovSgClient:
             records=records,
             total=int(result.get("total", len(records))),
         )
+
+    async def sample_rows(self, dataset_id: str, limit: int = 3) -> list[dict[str, str]]:
+        """Fetch a few real rows for a dataset, to show its columns' actual value formats.
+
+        Column names alone don't tell a query-planning LLM whether a "month"
+        column holds "1990-01" or "January 1990", so callers building a
+        filter plan pass these sample rows into the prompt to ground the
+        exact literal format instead. Cached per dataset_id for the life of
+        this client instance: a stale-by-a-few-rows sample is fine for this
+        purpose, and caching avoids one extra live API call per question
+        against a dataset already sampled.
+
+        Args:
+            dataset_id: The data.gov.sg resource_id.
+            limit: Number of sample rows to fetch on a cache miss.
+
+        Returns:
+            Up to `limit` raw rows.
+
+        Raises:
+            DatasetNotFoundError: If dataset_id has no live datastore resource.
+            DataGovSgError: If the request otherwise fails.
+        """
+        if dataset_id not in self._sample_cache:
+            result = await self.datastore_search(dataset_id, limit=limit)
+            self._sample_cache[dataset_id] = result.records
+        return self._sample_cache[dataset_id]
 
     async def fetch_all_matching(
         self,

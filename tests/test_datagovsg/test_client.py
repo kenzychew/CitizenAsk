@@ -143,6 +143,43 @@ class TestDatastoreSearchMocked:
 
     @pytest.mark.asyncio
     @respx.mock
+    async def test_sample_rows_returns_records(self, client: DataGovSgClient) -> None:
+        """sample_rows fetches a small page of real rows."""
+        respx.get("https://data.gov.sg/api/action/datastore_search").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "success": True,
+                    "result": {
+                        "records": [{"month": "1990-01", "town": "BISHAN"}],
+                        "total": 500,
+                    },
+                },
+            )
+        )
+
+        rows = await client.sample_rows(HDB_RESALE_DATASET_ID, limit=3)
+
+        assert rows == [{"month": "1990-01", "town": "BISHAN"}]
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_sample_rows_caches_per_dataset_id(self, client: DataGovSgClient) -> None:
+        """A second sample_rows call for the same dataset does not hit the API again."""
+        route = respx.get("https://data.gov.sg/api/action/datastore_search").mock(
+            return_value=httpx.Response(
+                200,
+                json={"success": True, "result": {"records": [{"month": "1990-01"}], "total": 1}},
+            )
+        )
+
+        await client.sample_rows(HDB_RESALE_DATASET_ID)
+        await client.sample_rows(HDB_RESALE_DATASET_ID)
+
+        assert route.call_count == 1
+
+    @pytest.mark.asyncio
+    @respx.mock
     async def test_fetch_all_matching_paginates(self, client: DataGovSgClient) -> None:
         """fetch_all_matching walks pages until a short page ends pagination."""
         route = respx.get("https://data.gov.sg/api/action/datastore_search")

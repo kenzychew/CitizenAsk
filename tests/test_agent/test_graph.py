@@ -51,7 +51,9 @@ DOCUMENT_DATASET = DatasetEntry(
 def _never_called_plan_query():
     """A plan_query stub that fails the test if the LLM boundary is touched."""
 
-    async def plan_query(question: str, dataset: DatasetEntry) -> QueryPlan:
+    async def plan_query(
+        question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]]
+    ) -> QueryPlan:
         raise AssertionError("plan_query should not be called on this path")
 
     return plan_query
@@ -134,7 +136,9 @@ class TestStructuredPath:
     async def test_confident_structured_match_produces_cited_answer(self) -> None:
         """A confident structured match plans, queries, computes, and cites the dataset."""
 
-        async def plan_query(question: str, dataset: DatasetEntry) -> QueryPlan:
+        async def plan_query(
+            question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]]
+        ) -> QueryPlan:
             return QueryPlan(operation="count", filters={"town": "BISHAN"})
 
         async def generate_answer(messages: object) -> str:
@@ -166,10 +170,85 @@ class TestStructuredPath:
         assert client.calls == [(STRUCTURED_DATASET.dataset_id, {"town": "BISHAN"})]
 
     @pytest.mark.asyncio
+    async def test_plan_query_receives_sample_rows(self) -> None:
+        """The sample rows fetched from the client reach plan_query before filters are chosen."""
+        received_samples: list[list[dict[str, str]]] = []
+
+        async def plan_query(
+            question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]]
+        ) -> QueryPlan:
+            received_samples.append(sample_rows)
+            return QueryPlan(operation="count", filters={"month": "1990-01"})
+
+        async def generate_answer(messages: object) -> str:
+            return "There were 151 matching transactions."
+
+        client = StubDataGovSgClient(
+            result=DatastoreQueryResult(
+                dataset_id=STRUCTURED_DATASET.dataset_id,
+                records=[{"month": "1990-01"} for _ in range(151)],
+                total=151,
+            ),
+            sample=[{"month": "1990-01", "town": "BISHAN"}],
+        )
+        deps = AgentDependencies(
+            discovery=StubDiscovery([DiscoveryMatch(dataset=STRUCTURED_DATASET, score=5.0)]),
+            datagovsg_client=client,
+            retriever=StubRetriever([]),
+            plan_query=plan_query,
+            generate_answer=generate_answer,
+            config=AppConfig(),
+        )
+
+        await run_agent(deps, "How many resale transactions happened in Bishan in January 1990?")
+
+        assert received_samples == [[{"month": "1990-01", "town": "BISHAN"}]]
+
+    @pytest.mark.asyncio
+    async def test_sample_fetch_failure_falls_back_to_planning_without_sample(self) -> None:
+        """A sample-row fetch failure degrades to an empty sample instead of failing the query."""
+        received_samples: list[list[dict[str, str]]] = []
+
+        async def plan_query(
+            question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]]
+        ) -> QueryPlan:
+            received_samples.append(sample_rows)
+            return QueryPlan(operation="count", filters={"town": "BISHAN"})
+
+        async def generate_answer(messages: object) -> str:
+            return "There were 42 matching transactions in Bishan."
+
+        client = StubDataGovSgClient(
+            result=DatastoreQueryResult(
+                dataset_id=STRUCTURED_DATASET.dataset_id,
+                records=[{"town": "BISHAN"} for _ in range(42)],
+                total=42,
+            ),
+            sample_error=DatasetNotFoundError("no live resource"),
+        )
+        deps = AgentDependencies(
+            discovery=StubDiscovery([DiscoveryMatch(dataset=STRUCTURED_DATASET, score=5.0)]),
+            datagovsg_client=client,
+            retriever=StubRetriever([]),
+            plan_query=plan_query,
+            generate_answer=generate_answer,
+            config=AppConfig(),
+        )
+
+        answer = await run_agent(deps, "How many resale transactions happened in Bishan?")
+
+        assert received_samples == [[]]
+        assert answer.abstained is False
+        assert answer.route == "structured"
+        assert "42" in answer.answer
+
+    @pytest.mark.asyncio
     async def test_datagovsg_failure_produces_error_answer_not_abstention(self) -> None:
         """A data.gov.sg failure surfaces as an explanatory answer, not a silent abstention."""
 
-        async def plan_query(question: str, dataset: DatasetEntry) -> QueryPlan:
+        async def plan_query(
+            question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]]
+        ) -> QueryPlan:
             return QueryPlan(operation="count", filters={})
 
         client = StubDataGovSgClient(error=DatasetNotFoundError("no live resource"))
