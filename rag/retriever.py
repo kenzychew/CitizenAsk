@@ -3,10 +3,10 @@
 import asyncpg
 import numpy as np
 
-from src.config import RagConfig
-from src.exceptions import RetrievalError
-from src.rag.ingest import Embedder
-from src.schemas import DocChunk, RetrievedChunk
+from config import RagConfig
+from exceptions import RetrievalError
+from rag.ingest import Embedder
+from schemas import DocChunk, RetrievedChunk
 
 SIMILARITY_SEARCH_SQL = """
 SELECT chunk_id, text, source, chunk_index, 1 - (embedding <=> $1) AS score

@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.catalog.discovery import CatalogDiscovery
-from src.schemas import DatasetEntry, DatasetKind
+from catalog.discovery import CatalogDiscovery
+from schemas import DatasetEntry, DatasetKind
 
 
 def _entry(dataset_id: str, title: str, description: str, tags: list[str]) -> DatasetEntry:

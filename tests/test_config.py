@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from src.config import AppConfig, load_config
+from config import AppConfig, load_config
 
 
 class TestLoadConfig:

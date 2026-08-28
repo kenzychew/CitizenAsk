@@ -40,7 +40,7 @@ select = ["E", "W", "F", "I", "C", "B", "UP"]
 ignore = []
 
 [tool.ruff.lint.isort]
-known-first-party = ["src"]
+known-first-party = ["agent", "api", "catalog", "datagovsg", "generation", "rag", "config", "schemas", "exceptions", "app_logging"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -75,7 +75,8 @@ markers = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["agent", "api", "catalog", "datagovsg", "generation", "rag"]
+include = ["config.py", "schemas.py", "exceptions.py", "app_logging.py"]
 
 [build-system]
 requires = ["hatchling"]

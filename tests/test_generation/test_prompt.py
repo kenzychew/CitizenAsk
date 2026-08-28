@@ -2,7 +2,7 @@
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from src.generation.prompt import (
+from generation.prompt import (
     QueryFilter,
     QueryPlan,
     QueryPlanLLM,
@@ -10,7 +10,7 @@ from src.generation.prompt import (
     build_rag_answer_messages,
     build_structured_answer_messages,
 )
-from src.schemas import DatasetEntry, DatasetKind, DatastoreQueryResult, DocChunk, RetrievedChunk
+from schemas import DatasetEntry, DatasetKind, DatastoreQueryResult, DocChunk, RetrievedChunk
 
 
 class TestBuildPlanMessages:

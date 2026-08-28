@@ -7,7 +7,7 @@ fully exercised, only the network calls at its edges are replaced.
 
 import pytest
 
-from src.agent.graph import (
+from agent.graph import (
     NO_RAG_CONTEXT_MESSAGE,
     RAG_UNAVAILABLE_MESSAGE,
     AgentDependencies,
@@ -15,10 +15,10 @@ from src.agent.graph import (
     route_after_discover,
     run_agent,
 )
-from src.config import AppConfig
-from src.exceptions import DatasetNotFoundError
-from src.generation.prompt import ABSTENTION_MESSAGE, QueryPlan
-from src.schemas import (
+from config import AppConfig
+from exceptions import DatasetNotFoundError
+from generation.prompt import ABSTENTION_MESSAGE, QueryPlan
+from schemas import (
     DatasetEntry,
     DatasetKind,
     DatastoreQueryResult,

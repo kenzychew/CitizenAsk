@@ -9,12 +9,12 @@ from fastapi import FastAPI, Query
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
-from src.agent.graph import run_agent
-from src.api.dependencies import close_pool, get_agent_deps, init_dependencies, rag_available
-from src.catalog.registry import REGISTRY
-from src.config import load_config
-from src.exceptions import CitizenAskError
-from src.logging import setup_logging
+from agent.graph import run_agent
+from api.dependencies import close_pool, get_agent_deps, init_dependencies, rag_available
+from app_logging import setup_logging
+from catalog.registry import REGISTRY
+from config import load_config
+from exceptions import CitizenAskError
 
 logger = logging.getLogger(__name__)
 

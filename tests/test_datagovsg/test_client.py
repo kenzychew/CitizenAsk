@@ -4,9 +4,9 @@ import httpx
 import pytest
 import respx
 
-from src.config import DataGovSgConfig
-from src.datagovsg.client import DataGovSgClient
-from src.exceptions import DataGovSgError, DatasetNotFoundError
+from config import DataGovSgConfig
+from datagovsg.client import DataGovSgClient
+from exceptions import DataGovSgError, DatasetNotFoundError
 
 HDB_RESALE_DATASET_ID = "d_ebc5ab87086db484f88045b47411ebc5"
 

@@ -11,10 +11,10 @@ from collections.abc import AsyncIterator
 import httpx
 import pytest
 
-from src.agent.graph import AgentDependencies
-from src.api import dependencies as deps_module
-from src.api.main import app
-from src.config import AppConfig
+from agent.graph import AgentDependencies
+from api import dependencies as deps_module
+from api.main import app
+from config import AppConfig
 from tests.test_agent.conftest import StubDataGovSgClient, StubDiscovery, StubRetriever
 
 

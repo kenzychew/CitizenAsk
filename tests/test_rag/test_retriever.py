@@ -2,9 +2,9 @@
 
 import pytest
 
-from src.config import RagConfig
-from src.rag.ingest import Embedder
-from src.rag.retriever import DocRetriever
+from config import RagConfig
+from rag.ingest import Embedder
+from rag.retriever import DocRetriever
 from tests.test_rag.conftest import FakePool
 
 

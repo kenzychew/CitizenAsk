@@ -11,7 +11,7 @@ mode, which rejects any field typed as an open-ended `dict[str, str]`
 (arbitrary keys, no fixed `properties` list) — a 400 on the *first* call, not
 a lint-time or unit-test failure, since the boundary-mocked tests stub the
 LLM call rather than exercising `with_structured_output` for real. See
-`src/generation/prompt.py`'s `QueryPlanLLM`/`QueryFilter` for the fix
+`generation/prompt.py`'s `QueryPlanLLM`/`QueryFilter` for the fix
 pattern: give the LLM a `list[{key, value}]`-shaped field instead of a dict,
 then convert to the dict shape downstream code expects immediately after the
 call returns. Apply the same pattern to any new structured-output schema
@@ -19,16 +19,31 @@ that would otherwise need an arbitrary-keys dict field.
 
 ## Grounding query-planning filter values with real sample rows
 
-`DatasetEntry.fields` (`src/schemas.py`) only carries column *names*, not the
+`DatasetEntry.fields` (`schemas.py`) only carries column *names*, not the
 literal format values take (e.g. a `month` column stored as `"1990-01"`, not
 "January 1990"). The planning LLM (`build_plan_messages`,
-`src/generation/prompt.py`) has no way to guess that format from metadata
-alone, so `structured_node` (`src/agent/graph.py`) fetches a few real rows
-via `DataGovSgClient.sample_rows` (`src/datagovsg/client.py`, cached per
+`generation/prompt.py`) has no way to guess that format from metadata
+alone, so `structured_node` (`agent/graph.py`) fetches a few real rows
+via `DataGovSgClient.sample_rows` (`datagovsg/client.py`, cached per
 `dataset_id` on the client instance) and passes them into the prompt as
 "Example rows" before planning. Apply the same pattern — show the LLM real
 data rather than hand-encoding a formatting rule — for any new column whose
 value format isn't self-evident from its name.
+
+## Flat layout: no `src/` nesting, and the `app_logging.py` naming exception
+
+Packages live directly at the repo root (`agent/`, `api/`, `catalog/`,
+`datagovsg/`, `generation/`, `rag/`) alongside root-level modules
+(`config.py`, `schemas.py`, `exceptions.py`, `app_logging.py`) — there is no
+`src/` layer. One module was deliberately named `app_logging.py` rather than
+`logging.py`: a root-level `logging.py` shadows Python's stdlib `logging`
+package (since the project root sits on `sys.path` via the editable
+install), and which module wins is invocation-dependent — `uvicorn` picked
+stdlib `logging` and failed to find `setup_logging`, while `python -c`/pytest
+picked the local file and broke every third-party import of stdlib `logging`
+(e.g. `python-dotenv`). When adding or renaming any top-level module, check
+its name against `sys.stdlib_module_names` first and pick a non-colliding
+name rather than reproducing this.
 
 ## Maintaining this file
 

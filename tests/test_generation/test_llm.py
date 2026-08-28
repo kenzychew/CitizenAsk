@@ -3,9 +3,9 @@
 import pytest
 from langchain_openai import ChatOpenAI
 
-from src.config import GenerationConfig
-from src.exceptions import GenerationError
-from src.generation.llm import get_chat_model
+from config import GenerationConfig
+from exceptions import GenerationError
+from generation.llm import get_chat_model
 
 
 class TestGetChatModel:
