@@ -149,7 +149,7 @@ def evaluate_rag(rag_config: Any, questions: list[dict[str, Any]]) -> dict[str, 
     """Score real local-embedding retrieval over the ingested document corpus.
 
     Runs the actual chunker and sentence-transformers embedder from
-    src/rag/ingest.py, then brute-force cosine similarity search (no
+    rag/ingest.py, then brute-force cosine similarity search (no
     Postgres needed for evaluation purposes -- the pgvector storage layer
     itself is covered by tests/test_rag's mocked-pool tests).
 
