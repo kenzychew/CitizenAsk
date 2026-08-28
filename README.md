@@ -28,21 +28,21 @@ discover (BM25 over curated registry metadata: title, agency, description, tags)
 
 ### Dataset discovery: BM25, not embeddings
 
-The curated registry is 32 hand-picked, individually verified data.gov.sg datasets. Discovery scores a question against each entry's title/agency/description/tags with BM25 (`src/catalog/discovery.py`), not an embedding model. The registry is small and the matching problem is lexical (does this question's vocabulary overlap with this dataset's metadata), so BM25 gets the job done without an API key or a vector index, and it's what makes discovery accuracy fully testable offline.
+The curated registry is 32 hand-picked, individually verified data.gov.sg datasets. Discovery scores a question against each entry's title/agency/description/tags with BM25 (`catalog/discovery.py`), not an embedding model. The registry is small and the matching problem is lexical (does this question's vocabulary overlap with this dataset's metadata), so BM25 gets the job done without an API key or a vector index, and it's what makes discovery accuracy fully testable offline.
 
 The tradeoff: BM25 can false-positive on short, generic phrasing that happens to share a word with a dataset title. In manual calibration, "What is the meaning of life?" scored 5.98 against `CPF LIFE Payout Guide` (because of the word "life") and "Recommend a good science fiction movie" scored 8.3 against the PSLE Science dataset (because of "science"), both above a naive threshold. The confidence threshold (4.5, in `configs/config.yaml`) was picked from a wider calibration sweep where genuinely out-of-scope questions scored under 3.5 and genuinely in-scope questions scored above 5.1, but adversarial short queries that lexically collide with a dataset's title are a known, real limitation of this approach rather than a solved problem.
 
 ### Structured queries against the real API
 
-Once discovery finds a `STRUCTURED` dataset, an LLM call turns the question into a `QueryPlan` (operation + column filters + numeric field, `src/generation/prompt.py`), which `src/datagovsg/client.py` executes against the real `https://data.gov.sg/api/action/datastore_search` endpoint, no API key required. The client paginates through matching rows (`fetch_all_matching`, capped at 10,000 rows as a safety limit) and retries HTTP 429s with backoff, which the live API does return under sustained unauthenticated traffic. `src/agent/tools.py` then computes count/average/sum/min/max over the fetched rows, or returns a capped row list, before a final LLM call synthesizes the answer.
+Once discovery finds a `STRUCTURED` dataset, an LLM call turns the question into a `QueryPlan` (operation + column filters + numeric field, `generation/prompt.py`), which `datagovsg/client.py` executes against the real `https://data.gov.sg/api/action/datastore_search` endpoint, no API key required. The client paginates through matching rows (`fetch_all_matching`, capped at 10,000 rows as a safety limit) and retries HTTP 429s with backoff, which the live API does return under sustained unauthenticated traffic. `agent/tools.py` then computes count/average/sum/min/max over the fetched rows, or returns a capped row list, before a final LLM call synthesizes the answer.
 
 ### RAG fallback for document-shaped agencies
 
-Some registry entries are guide-shaped rather than table-shaped (CPF LIFE payouts, HDB's BTO process, NEA's dengue programme, LTA's COE system, PUB's NEWater, MOH's MediSave). Their content lives as plain text under `data/` and is chunked, embedded locally with `sentence-transformers` (`all-MiniLM-L6-v2`, no API key), and stored in Postgres via `pgvector` (`src/rag/ingest.py`, `src/rag/retriever.py`). If retrieval turns up nothing relevant, the RAG node abstains rather than answering from thin air; if Postgres was unreachable at startup (no retriever configured), it abstains with a distinct "document search is temporarily unavailable" message instead of crashing.
+Some registry entries are guide-shaped rather than table-shaped (CPF LIFE payouts, HDB's BTO process, NEA's dengue programme, LTA's COE system, PUB's NEWater, MOH's MediSave). Their content lives as plain text under `data/` and is chunked, embedded locally with `sentence-transformers` (`all-MiniLM-L6-v2`, no API key), and stored in Postgres via `pgvector` (`rag/ingest.py`, `rag/retriever.py`). If retrieval turns up nothing relevant, the RAG node abstains rather than answering from thin air; if Postgres was unreachable at startup (no retriever configured), it abstains with a distinct "document search is temporarily unavailable" message instead of crashing.
 
 ### Abstention
 
-If discovery's top score is below the confidence threshold, the graph routes straight to an `abstain` node that never touches the LLM: the agent says plainly that it doesn't have a matching dataset (`src/generation/prompt.py::ABSTENTION_MESSAGE`). A structured query that finds a matching dataset but then fails at the data.gov.sg call (unknown resource_id, no matching rows) is treated differently: that's a real answer ("I found the dataset but couldn't compute this"), not a silent guess and not a blanket abstention.
+If discovery's top score is below the confidence threshold, the graph routes straight to an `abstain` node that never touches the LLM: the agent says plainly that it doesn't have a matching dataset (`generation/prompt.py::ABSTENTION_MESSAGE`). A structured query that finds a matching dataset but then fails at the data.gov.sg call (unknown resource_id, no matching rows) is treated differently: that's a real answer ("I found the dataset but couldn't compute this"), not a silent guess and not a blanket abstention.
 
 ## Evaluation
 
@@ -92,7 +92,7 @@ Everything that doesn't need Postgres or a live LLM call continues to be exercis
 - **Structured data**: real `data.gov.sg` `datastore_search` API, `httpx` + `tenacity` retries
 - **RAG**: PostgreSQL + pgvector, local `sentence-transformers` embeddings
 - **API**: FastAPI, SSE streaming (`sse-starlette`)
-- **Config**: YAML under `configs/`, loaded through `src/config.py::load_config`
+- **Config**: YAML under `configs/`, loaded through `config.py::load_config`
 - **Testing**: pytest, mocked LLM/DB boundaries, live data.gov.sg integration tests
 
 <details>
@@ -112,7 +112,7 @@ cp .env.example .env
 # Edit .env: set OPENAI_API_KEY and (if using RAG) DATABASE_URL
 
 uv sync
-uv run uvicorn src.api.main:app --reload --port 8000
+uv run uvicorn api.main:app --reload --port 8000
 ```
 
 Then query it:
@@ -129,8 +129,8 @@ Against a running Postgres with `pgvector`, from a Python shell or a short scrip
 
 ```python
 import asyncio
-from src.config import load_config
-from src.rag.ingest import Embedder, VectorIndexer, chunk_text, load_documents
+from config import load_config
+from rag.ingest import Embedder, VectorIndexer, chunk_text, load_documents
 import asyncpg
 
 
@@ -169,7 +169,7 @@ uv run python eval/evaluate.py
 # Lint, format, typecheck
 uv run ruff check .
 uv run ruff format .
-uv run mypy --strict src
+uv run mypy --strict agent api catalog datagovsg generation rag config.py schemas.py exceptions.py app_logging.py
 ```
 
 ### API
@@ -184,34 +184,33 @@ uv run mypy --strict src
 <summary>Project structure</summary>
 
 ```
-src/
-  agent/
-    graph.py            # LangGraph StateGraph: discover -> structured/rag/abstain
-    tools.py             # Structured-query result computation (count/avg/sum/min/max)
-  catalog/
-    registry.py          # 32 curated, individually verified data.gov.sg datasets
-    discovery.py          # BM25 discovery over registry metadata
-  datagovsg/
-    client.py             # Real datastore_search client (pagination, 429 retry)
-  rag/
-    ingest.py              # Document loading, chunking, local embedding, pgvector indexing
-    retriever.py            # pgvector cosine similarity retrieval
-  generation/
-    llm.py                  # OpenAI client factory + plan_query/generate_answer wiring
-    prompt.py                # Prompt templates, QueryPlan schema, abstention message
-  api/
-    main.py                   # FastAPI app: /query (SSE), /datasets, /health
-    dependencies.py            # Dependency container, graceful Postgres degradation
-  config.py                    # AppConfig dataclasses, load_config helper
-  schemas.py                    # Shared dataclasses (DatasetEntry, DocChunk, AgentAnswer, ...)
-  exceptions.py                  # Domain exception hierarchy
-  logging.py                      # setup_logging() YAML config with basicConfig fallback
+agent/
+  graph.py              # LangGraph StateGraph: discover -> structured/rag/abstain
+  tools.py               # Structured-query result computation (count/avg/sum/min/max)
+catalog/
+  registry.py            # 32 curated, individually verified data.gov.sg datasets
+  discovery.py            # BM25 discovery over registry metadata
+datagovsg/
+  client.py               # Real datastore_search client (pagination, 429 retry)
+rag/
+  ingest.py                # Document loading, chunking, local embedding, pgvector indexing
+  retriever.py              # pgvector cosine similarity retrieval
+generation/
+  llm.py                    # OpenAI client factory + plan_query/generate_answer wiring
+  prompt.py                  # Prompt templates, QueryPlan schema, abstention message
+api/
+  main.py                     # FastAPI app: /query (SSE), /datasets, /health
+  dependencies.py              # Dependency container, graceful Postgres degradation
+config.py                      # AppConfig dataclasses, load_config helper
+schemas.py                      # Shared dataclasses (DatasetEntry, DocChunk, AgentAnswer, ...)
+exceptions.py                    # Domain exception hierarchy
+app_logging.py                    # setup_logging() YAML config with basicConfig fallback (named app_logging to avoid shadowing the stdlib logging module)
 configs/                          # config.yaml, logging.yaml
 eval/
   questions.json                  # 20 dataset-selection + 8 structured + 6 RAG + 10 abstention
   evaluate.py                      # Runs all four against real data, writes results.json
 data/                              # RAG document corpus (6 agency guides)
-tests/                             # pytest, mirrors src/ layout
+tests/                             # pytest, one test package per top-level package
 ```
 
 </details>
