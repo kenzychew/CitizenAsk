@@ -3,7 +3,7 @@
 import logging
 from pathlib import Path
 
-from src.logging import setup_logging
+from app_logging import setup_logging
 
 
 class TestSetupLogging:

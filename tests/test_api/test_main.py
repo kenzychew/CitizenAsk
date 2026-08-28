@@ -3,11 +3,11 @@
 import httpx
 import pytest
 
-from src.agent.graph import AgentDependencies
-from src.api import dependencies as deps_module
-from src.catalog.registry import REGISTRY
-from src.config import AppConfig
-from src.schemas import DatasetEntry, DatasetKind, DiscoveryMatch, DocChunk, RetrievedChunk
+from agent.graph import AgentDependencies
+from api import dependencies as deps_module
+from catalog.registry import REGISTRY
+from config import AppConfig
+from schemas import DatasetEntry, DatasetKind, DiscoveryMatch, DocChunk, RetrievedChunk
 from tests.test_agent.conftest import StubDataGovSgClient, StubDiscovery, StubRetriever
 
 

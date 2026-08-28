@@ -9,9 +9,9 @@ import asyncpg
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from src.config import RagConfig
-from src.exceptions import EmbeddingError, IngestionError
-from src.schemas import DocChunk
+from config import RagConfig
+from exceptions import EmbeddingError, IngestionError
+from schemas import DocChunk
 
 logger = logging.getLogger(__name__)
 

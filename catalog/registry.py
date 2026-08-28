@@ -8,7 +8,7 @@ have no live datastore resource; their text lives under data/ and is
 ingested by the RAG fallback instead.
 """
 
-from src.schemas import DatasetEntry, DatasetKind
+from schemas import DatasetEntry, DatasetKind
 
 REGISTRY: list[DatasetEntry] = [
     # --- Housing ---

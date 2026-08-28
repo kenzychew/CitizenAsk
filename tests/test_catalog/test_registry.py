@@ -2,10 +2,10 @@
 
 import pytest
 
-from src.catalog.registry import REGISTRY
-from src.config import DataGovSgConfig
-from src.datagovsg.client import DataGovSgClient
-from src.schemas import DatasetKind
+from catalog.registry import REGISTRY
+from config import DataGovSgConfig
+from datagovsg.client import DataGovSgClient
+from schemas import DatasetKind
 
 
 class TestRegistryShape:

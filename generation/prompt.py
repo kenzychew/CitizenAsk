@@ -5,7 +5,7 @@ from typing import Literal
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
-from src.schemas import DatasetEntry, DatastoreQueryResult, RetrievedChunk
+from schemas import DatasetEntry, DatastoreQueryResult, RetrievedChunk
 
 ABSTENTION_MESSAGE = (
     "I don't have a dataset in my curated registry that genuinely matches this "

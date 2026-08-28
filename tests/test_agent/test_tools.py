@@ -2,9 +2,9 @@
 
 import pytest
 
-from src.agent.tools import compute_structured_result
-from src.exceptions import DataGovSgError
-from src.generation.prompt import QueryPlan
+from agent.tools import compute_structured_result
+from exceptions import DataGovSgError
+from generation.prompt import QueryPlan
 
 
 class TestComputeStructuredResult:

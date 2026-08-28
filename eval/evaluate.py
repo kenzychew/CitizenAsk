@@ -15,14 +15,14 @@ from typing import Any
 
 import numpy as np
 
-from src.agent.tools import compute_structured_result
-from src.catalog.discovery import CatalogDiscovery
-from src.catalog.registry import REGISTRY
-from src.config import AppConfig, load_config
-from src.datagovsg.client import DataGovSgClient
-from src.exceptions import DataGovSgError
-from src.generation.prompt import QueryPlan
-from src.rag.ingest import Embedder, chunk_text, load_documents
+from agent.tools import compute_structured_result
+from catalog.discovery import CatalogDiscovery
+from catalog.registry import REGISTRY
+from config import AppConfig, load_config
+from datagovsg.client import DataGovSgClient
+from exceptions import DataGovSgError
+from generation.prompt import QueryPlan
+from rag.ingest import Embedder, chunk_text, load_documents
 
 logging.basicConfig(level=logging.WARNING)
 

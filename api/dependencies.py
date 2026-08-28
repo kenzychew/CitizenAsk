@@ -5,14 +5,14 @@ import logging
 import asyncpg
 from pgvector.asyncpg import register_vector
 
-from src.agent.graph import AgentDependencies
-from src.catalog.discovery import CatalogDiscovery
-from src.catalog.registry import REGISTRY
-from src.config import AppConfig
-from src.datagovsg.client import DataGovSgClient
-from src.generation.llm import get_chat_model, make_generate_answer, make_plan_query
-from src.rag.ingest import Embedder
-from src.rag.retriever import DocRetriever
+from agent.graph import AgentDependencies
+from catalog.discovery import CatalogDiscovery
+from catalog.registry import REGISTRY
+from config import AppConfig
+from datagovsg.client import DataGovSgClient
+from generation.llm import get_chat_model, make_generate_answer, make_plan_query
+from rag.ingest import Embedder
+from rag.retriever import DocRetriever
 
 logger = logging.getLogger(__name__)
 

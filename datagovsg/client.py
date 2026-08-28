@@ -11,9 +11,9 @@ import logging
 import httpx
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from src.config import DataGovSgConfig
-from src.exceptions import DataGovSgError, DatasetNotFoundError, RateLimitError
-from src.schemas import DatastoreQueryResult
+from config import DataGovSgConfig
+from exceptions import DataGovSgError, DatasetNotFoundError, RateLimitError
+from schemas import DatastoreQueryResult
 
 logger = logging.getLogger(__name__)
 

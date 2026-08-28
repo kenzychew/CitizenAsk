@@ -1,7 +1,7 @@
 """Fakes for agent graph tests: discovery, data.gov.sg client, and retriever."""
 
-from src.exceptions import DataGovSgError
-from src.schemas import DatastoreQueryResult, DiscoveryMatch, RetrievedChunk
+from exceptions import DataGovSgError
+from schemas import DatastoreQueryResult, DiscoveryMatch, RetrievedChunk
 
 
 class StubDiscovery:

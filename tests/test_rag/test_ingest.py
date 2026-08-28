@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from src.config import RagConfig
-from src.exceptions import EmbeddingError, IngestionError
-from src.rag.ingest import Embedder, VectorIndexer, chunk_text, load_documents
-from src.schemas import DocChunk
+from config import RagConfig
+from exceptions import EmbeddingError, IngestionError
+from rag.ingest import Embedder, VectorIndexer, chunk_text, load_documents
+from schemas import DocChunk
 from tests.test_rag.conftest import FakePool
 
 

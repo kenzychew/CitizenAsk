@@ -10,7 +10,7 @@ import re
 
 from rank_bm25 import BM25Okapi
 
-from src.schemas import DatasetEntry, DiscoveryMatch
+from schemas import DatasetEntry, DiscoveryMatch
 
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 

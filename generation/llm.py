@@ -12,10 +12,10 @@ from collections.abc import Awaitable, Callable
 from langchain_core.messages import BaseMessage
 from langchain_openai import ChatOpenAI
 
-from src.config import GenerationConfig
-from src.exceptions import GenerationError
-from src.generation.prompt import QueryPlan, QueryPlanLLM, build_plan_messages
-from src.schemas import DatasetEntry
+from config import GenerationConfig
+from exceptions import GenerationError
+from generation.prompt import QueryPlan, QueryPlanLLM, build_plan_messages
+from schemas import DatasetEntry
 
 
 def get_chat_model(config: GenerationConfig) -> ChatOpenAI:

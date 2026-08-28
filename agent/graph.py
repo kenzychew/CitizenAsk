@@ -9,19 +9,19 @@ from langchain_core.messages import BaseMessage
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from src.agent.tools import compute_structured_result
-from src.catalog.discovery import CatalogDiscovery
-from src.config import AppConfig
-from src.datagovsg.client import DataGovSgClient
-from src.exceptions import DataGovSgError
-from src.generation.prompt import (
+from agent.tools import compute_structured_result
+from catalog.discovery import CatalogDiscovery
+from config import AppConfig
+from datagovsg.client import DataGovSgClient
+from exceptions import DataGovSgError
+from generation.prompt import (
     ABSTENTION_MESSAGE,
     QueryPlan,
     build_rag_answer_messages,
     build_structured_answer_messages,
 )
-from src.rag.retriever import DocRetriever
-from src.schemas import (
+from rag.retriever import DocRetriever
+from schemas import (
     AgentAnswer,
     DatasetEntry,
     DatasetKind,
