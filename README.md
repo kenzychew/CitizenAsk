@@ -136,31 +136,13 @@ curl "http://localhost:8000/health"
 
 ### Ingesting the RAG document corpus
 
-Against a running Postgres with `pgvector`, from a Python shell or a short script:
+Against a running Postgres with `pgvector`:
 
-```python
-import asyncio
-from config import load_config
-from rag.ingest import Embedder, VectorIndexer, chunk_text, load_documents
-import asyncpg
-
-
-async def main():
-    config = load_config()
-    pool = await asyncpg.create_pool(config.database_url)
-    indexer = VectorIndexer(pool, config.rag)
-    await indexer.ensure_table()
-
-    embedder = Embedder(config.rag)
-    chunks = []
-    for source, text in load_documents(config.data_dir):
-        chunks.extend(chunk_text(text, source, config.rag.chunk_size, config.rag.chunk_overlap))
-    embedder.embed_chunks(chunks)
-    await indexer.upsert_chunks(chunks)
-
-
-asyncio.run(main())
+```bash
+uv run python -m scripts.ingest
 ```
+
+This chunks, embeds, and upserts every document under `data/` (`scripts/ingest.py`).
 
 ### Local development
 
@@ -220,6 +202,8 @@ configs/                          # config.yaml, logging.yaml
 eval/
   questions.json                  # 20 dataset-selection + 8 structured + 6 RAG + 10 abstention
   evaluate.py                      # Runs all four against real data, writes results.json
+scripts/
+  ingest.py                       # CLI: chunk, embed, and upsert data/ into pgvector
 data/                              # RAG document corpus (6 agency guides)
 tests/                             # pytest, one test package per top-level package
 ```
