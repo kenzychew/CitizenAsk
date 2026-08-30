@@ -162,7 +162,7 @@ uv run python eval/evaluate.py
 # Lint, format, typecheck
 uv run ruff check .
 uv run ruff format .
-uv run mypy --strict agent api catalog datagovsg generation rag config.py schemas.py exceptions.py app_logging.py
+uv run mypy --strict agent api catalog datagovsg generation rag config.py schemas.py exceptions.py app_logging.py scripts/ingest.py
 ```
 
 ### API

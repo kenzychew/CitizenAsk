@@ -25,6 +25,6 @@ jobs:
       - name: Format check
         run: uv run ruff format --check .
       - name: Typecheck
-        run: uv run mypy --strict agent api catalog datagovsg generation rag config.py schemas.py exceptions.py app_logging.py
+        run: uv run mypy --strict agent api catalog datagovsg generation rag config.py schemas.py exceptions.py app_logging.py scripts/ingest.py
       - name: Test
         run: uv run pytest -m "not integration" -q
