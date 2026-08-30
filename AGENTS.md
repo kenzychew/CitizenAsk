@@ -58,6 +58,20 @@ then call `create_pool` — see `api/dependencies.py::_try_create_pool` and
 that creates its own pool against this database rather than reusing the
 process-wide one.
 
+## Generation dependencies must degrade gracefully like the Postgres pool
+
+`init_dependencies` (`api/dependencies.py`) used to call `get_chat_model`
+unconditionally, which raises `GenerationError` when `OPENAI_API_KEY` is
+unset — this crashed the FastAPI `lifespan` at startup, so `/health` was
+never reachable at all on a fresh deploy before secrets are configured (a
+real bug caught while adding `railway.toml`'s healthcheck). Fixed by wrapping
+the `get_chat_model`/`make_plan_query`/`make_generate_answer` calls in a
+`try/except GenerationError` and falling back to stub callables that raise
+only when actually invoked, mirroring `_try_create_pool`'s existing
+graceful-degradation pattern for Postgres. Apply the same shape — degrade at
+startup, fail loudly only at first real use — to any new dependency that
+needs a secret which may not be configured yet.
+
 ## Maintaining this file
 
 Keep this file for knowledge useful to almost every future agent session in this project.

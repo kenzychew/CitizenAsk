@@ -3,18 +3,34 @@
 import logging
 
 import asyncpg
+from langchain_core.messages import BaseMessage
 from pgvector.asyncpg import register_vector
 
-from agent.graph import AgentDependencies
+from agent.graph import AgentDependencies, AnswerFn, PlanFn
 from catalog.discovery import CatalogDiscovery
 from catalog.registry import REGISTRY
 from config import AppConfig
 from datagovsg.client import DataGovSgClient
+from exceptions import GenerationError
 from generation.llm import get_chat_model, make_generate_answer, make_plan_query
+from generation.prompt import QueryPlan
 from rag.ingest import Embedder
 from rag.retriever import DocRetriever
+from schemas import DatasetEntry
 
 logger = logging.getLogger(__name__)
+
+
+async def _unavailable_plan_query(
+    question: str, dataset: DatasetEntry, sample_rows: list[dict[str, str]]
+) -> QueryPlan:
+    """Stand in for plan_query when no OPENAI_API_KEY was configured at startup."""
+    raise GenerationError("OPENAI_API_KEY is not set; cannot plan a structured query.")
+
+
+async def _unavailable_generate_answer(messages: list[BaseMessage]) -> str:
+    """Stand in for generate_answer when no OPENAI_API_KEY was configured at startup."""
+    raise GenerationError("OPENAI_API_KEY is not set; cannot generate an answer.")
 
 
 class DependencyContainer:
@@ -83,14 +99,23 @@ async def init_dependencies(config: AppConfig) -> None:
     embedder = Embedder(config.rag)
     retriever = DocRetriever(_container.pool, embedder, config.rag) if _container.pool else None
 
-    llm = get_chat_model(config.generation)
+    plan_query: PlanFn
+    generate_answer: AnswerFn
+    try:
+        llm = get_chat_model(config.generation)
+        plan_query = make_plan_query(llm)
+        generate_answer = make_generate_answer(llm)
+    except GenerationError as exc:
+        logger.warning("OpenAI unavailable, generation will be degraded: %s", exc)
+        plan_query = _unavailable_plan_query
+        generate_answer = _unavailable_generate_answer
 
     _container.agent_deps = AgentDependencies(
         discovery=discovery,
         datagovsg_client=datagovsg_client,
         retriever=retriever,
-        plan_query=make_plan_query(llm),
-        generate_answer=make_generate_answer(llm),
+        plan_query=plan_query,
+        generate_answer=generate_answer,
         config=config,
     )
     logger.info("All dependencies initialized")
