@@ -79,7 +79,18 @@ On 2026-08-25 the running app (`uv run uvicorn api.main:app --port 8000`) was sm
     - "average HDB resale price in Bishan" (no date filter, the already-fixed path from the casing fix above) still returns "The average HDB resale price in Bishan is 344,194.18." — unchanged from the earlier verification, confirming the new sample-fetch step didn't regress it.
     - **Tradeoff, not fully eliminated**: fetching a sample adds one extra live `datastore_search` call the first time `structured_node` sees a given dataset in a process's lifetime — not on every question, since `sample_rows` caches per dataset_id on the `DataGovSgClient` instance, and that instance is a process-wide singleton (`api/dependencies.py`). For the 32-dataset curated registry this is at most 32 extra calls total over the life of a running app, not one per request.
   - Abstention was re-confirmed live and is unchanged from 2026-08-25 (see bullet above).
-- **pgvector storage / RAG retrieval** (`rag/ingest.py::VectorIndexer`, `rag/retriever.py::DocRetriever`): still not tested live. No Postgres was reachable in this environment (port 5432 closed, no `psql`/`pg_isready` binary installed, no `docker-compose` file in the repo, and Docker itself isn't wired up in this WSL distro to stand one up locally). `/health` correctly reported `rag_available: false` instead of crashing, and the RAG node's graceful-degradation message ("document search is temporarily unavailable") was confirmed live on both queries above that routed to `rag`. Unit tests continue to cover the real SQL (extension/table/index DDL, upsert, cosine similarity search) against a fake `asyncpg.Pool`/`Connection` (`tests/test_rag/conftest.py`).
+- **pgvector storage / RAG retrieval** (`rag/ingest.py::VectorIndexer`, `rag/retriever.py::DocRetriever`): confirmed live on 2026-08-29 against a real Postgres (`pgvector/pgvector:pg18`) reachable from this environment. A new `scripts/ingest.py` entry point runs `VectorIndexer.ensure_table()` then chunks, embeds (real `sentence-transformers`, no API key), and upserts every document under `data/`; it ingested all 6 documents into 23 chunks in one run. Fixed one real bug while writing it: creating the connection pool with `register_vector` as the `init` hook (the same pattern `rag/ingest.py` itself never had to solve, since `api/dependencies.py` already got this right) fails on a fresh database, because the pooled connection's init hook tries to register the `vector` type codec before `CREATE EXTENSION IF NOT EXISTS vector` has ever run. Fixed by opening a standalone bootstrap connection to create the extension before building the pool, mirroring `api/dependencies.py::_try_create_pool`.
+  With the app running against this database, `/health` reported `rag_available: true`, and one real question was asked per DOCUMENT-kind dataset, with the answer and its cited chunks checked by hand against the source `data/*.txt` file:
+  - "How are CPF LIFE monthly payouts computed?" → correctly explained the Standard/Basic/Escalating plans, the 2%/year Escalating increase, and the ~7%/year deferral bonus, all matching `data/cpf-life-payouts.txt` exactly. `route: "rag"`, citations `["cpf-life-payouts.txt", "moh-medisave.txt"]`.
+  - "How does HDB BTO balloting and priority queue work?" → correctly described the post-window ballot, queue numbers, and the First-Timer/Married Child Priority Scheme, matching `data/hdb-bto-application.txt`.
+  - "What is the 5-step Mozzie Wipeout for dengue prevention?" → all five steps returned verbatim-equivalent to `data/nea-dengue-prevention.txt`.
+  - "How does the COE bidding system and Quota Premium work?" → correctly described the five vehicle categories and the lowest-successful-bid Quota Premium rule from `data/lta-coe-system.txt`, with one minor imprecision: it attached the doc's "moving average of recent COE prices" detail (which the source ties specifically to the *renewal* Prevailing Quota Premium) to the *initial* Quota Premium instead — real content from the right document, just merged from the wrong paragraph, not a fabrication.
+  - "How many NEWater plants are there and what are the Four National Taps?" → correctly listed all five plants (Bedok, Kranji, Ulu Pandan, Changi, Keppel Marina East) and all four taps, matching `data/pub-newater.txt`.
+  - "What can I use my MediSave for and how does it relate to MediShield Life?" → correctly described eligible uses, withdrawal limits, and the relationship to MediShield Life/CHAS, matching `data/moh-medisave.txt`.
+
+  The already-fixed structured-query path and abstention were re-verified against this same running instance to confirm the live database didn't regress anything: "What is the average HDB resale price in Bishan?" still returned "344,194.18" via `route: "structured"`, and "What's a good recipe for chicken curry?" still correctly abstained via `route: "abstain"`.
+
+  Unit tests continue to cover the real SQL (extension/table/index DDL, upsert, cosine similarity search) against a fake `asyncpg.Pool`/`Connection` (`tests/test_rag/conftest.py`) — that coverage is unchanged, this live run is additive verification, not a replacement.
 - **`eval/evaluate.py`**: re-run live with a real key present on 2026-08-25; output was numerically identical to the table above (all metrics 1.0). This is expected, not a live-LLM confirmation — as already noted below, this script's RAG/structured checks don't call the LLM at all. Not re-run for the 2026-08-26 fix, since it wouldn't exercise `make_plan_query` either; the direct `/query` calls above are the live confirmation for that path instead.
 
 Everything that doesn't need Postgres or a live LLM call continues to be exercised for real: the data.gov.sg client hits the live API in both unit tests (`@pytest.mark.integration`, `tests/test_datagovsg/test_client.py`) and the eval script; the embedder downloads and runs a real `sentence-transformers` model; BM25 discovery runs against the real 32-entry registry.
@@ -125,31 +136,13 @@ curl "http://localhost:8000/health"
 
 ### Ingesting the RAG document corpus
 
-Against a running Postgres with `pgvector`, from a Python shell or a short script:
+Against a running Postgres with `pgvector`:
 
-```python
-import asyncio
-from config import load_config
-from rag.ingest import Embedder, VectorIndexer, chunk_text, load_documents
-import asyncpg
-
-
-async def main():
-    config = load_config()
-    pool = await asyncpg.create_pool(config.database_url)
-    indexer = VectorIndexer(pool, config.rag)
-    await indexer.ensure_table()
-
-    embedder = Embedder(config.rag)
-    chunks = []
-    for source, text in load_documents(config.data_dir):
-        chunks.extend(chunk_text(text, source, config.rag.chunk_size, config.rag.chunk_overlap))
-    embedder.embed_chunks(chunks)
-    await indexer.upsert_chunks(chunks)
-
-
-asyncio.run(main())
+```bash
+uv run python -m scripts.ingest
 ```
+
+This chunks, embeds, and upserts every document under `data/` (`scripts/ingest.py`).
 
 ### Local development
 
@@ -169,7 +162,7 @@ uv run python eval/evaluate.py
 # Lint, format, typecheck
 uv run ruff check .
 uv run ruff format .
-uv run mypy --strict agent api catalog datagovsg generation rag config.py schemas.py exceptions.py app_logging.py
+uv run mypy --strict agent api catalog datagovsg generation rag config.py schemas.py exceptions.py app_logging.py scripts/ingest.py
 ```
 
 ### API
@@ -209,6 +202,8 @@ configs/                          # config.yaml, logging.yaml
 eval/
   questions.json                  # 20 dataset-selection + 8 structured + 6 RAG + 10 abstention
   evaluate.py                      # Runs all four against real data, writes results.json
+scripts/
+  ingest.py                       # CLI: chunk, embed, and upsert data/ into pgvector
 data/                              # RAG document corpus (6 agency guides)
 tests/                             # pytest, one test package per top-level package
 ```

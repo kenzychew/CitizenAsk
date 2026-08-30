@@ -45,6 +45,19 @@ picked the local file and broke every third-party import of stdlib `logging`
 its name against `sys.stdlib_module_names` first and pick a non-colliding
 name rather than reproducing this.
 
+## pgvector pool creation must bootstrap the extension first
+
+`asyncpg.create_pool(..., init=<hook that calls pgvector's register_vector>)`
+fails on a fresh database: `register_vector` looks up the `vector` type on
+the first connection the pool opens, but that type doesn't exist until
+`CREATE EXTENSION IF NOT EXISTS vector` has run, and the pool's `init` hook
+runs before any application code gets a chance to run that DDL. Open a
+standalone bootstrap connection to create the extension, close it, and only
+then call `create_pool` — see `api/dependencies.py::_try_create_pool` and
+`scripts/ingest.py::main` for the pattern. Apply it to any new code path
+that creates its own pool against this database rather than reusing the
+process-wide one.
+
 ## Maintaining this file
 
 Keep this file for knowledge useful to almost every future agent session in this project.
