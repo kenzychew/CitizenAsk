@@ -106,6 +106,31 @@ Everything that doesn't need Postgres or a live LLM call continues to be exercis
 - **Config**: YAML under `configs/`, loaded through `config.py::load_config`
 - **Testing**: pytest, mocked LLM/DB boundaries, live data.gov.sg integration tests
 
+## Deployment
+
+A `Dockerfile` (multi-stage `uv`-based build) and `railway.toml` exist at the
+repo root for deploying to [Railway](https://railway.app), following the
+same builder/runtime split proven in a sibling project. This documents that
+the repo *can* be deployed this way -- it has not been deployed yet; service
+creation, environment variables, and domain setup are a separate step.
+
+A real deployment needs two environment variables set on the Railway
+service:
+
+- `OPENAI_API_KEY`: for structured-query planning and answer generation.
+  Without it, the app still starts and `/health` still reports 200 (see
+  `api/dependencies.py`'s graceful degradation), but `/query` fails at
+  request time with a clear error instead of a silent failure.
+- `DATABASE_URL`: a pgvector-enabled Postgres connection string for the RAG
+  fallback. Without it, `/health` reports `rag_available: false` and
+  RAG-routed questions abstain instead of crashing.
+
+This repo does not stand up Postgres itself; a pgvector-enabled instance is
+provisioned as a separate Railway service, and the RAG document corpus still
+needs a one-time `uv run python -m scripts.ingest` run against it (see
+"Ingesting the RAG document corpus" below) before RAG answers have any
+content to retrieve.
+
 <details>
 <summary>Getting started</summary>
 
